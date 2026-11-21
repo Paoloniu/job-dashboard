@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Automotive Cybersecurity & Product Visa Job Dashboard</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a30;
+      --panel-2: #182340;
+      --border: #26355d;
+      --text: #eef2ff;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #818cf8;
+      --good: #22c55e;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(180deg, #090d1a 0%, var(--bg) 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 20px;
+      background: rgba(18, 26, 48, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 21px;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 8px 13px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, #0284c7, #4f46e5);
+      border-color: transparent;
+      font-weight: 600;
+    }
+
+    button.active-chip {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: var(--accent);
+      color: #bae6fd;
+      font-weight: 600;
+    }
+
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 16px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: 4px;
+      color: var(--accent);
+    }
+
+    .filters-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .filter-row:last-child {
+      margin-bottom: 0;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    input[type="password"],
+    select,
+    textarea {
+      background: #0c1326;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 11px;
+      font-size: 13px;
+    }
+
+    input[type="text"] {
+      min-width: 240px;
+      flex: 1;
+    }
+
+    .chip-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-right: 4px;
+    }
+
+    .board-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .board-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 11px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 12px;
+    }
+
+    .board-link:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .jobs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(390px, 1fr));
+      gap: 14px;
+    }
+
+    .job-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: border-color 0.16s ease, opacity 0.16s ease;
+    }
+
+    .job-card:hover {
+      border-color: var(--accent-2);
+    }
+
+    .job-card.irrelevant {
+      opacity: 0.45;
+      background: #0e1424;
+      border-style: dashed;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .job-title {
+      margin: 0 0 4px;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    .job-company {
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .irrelevant-btn {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #fca5a5;
+      white-space: nowrap;
+      font-size: 12px;
+      padding: 6px 10px;
+    }
+
+    .irrelevant-btn.active {
+      background: rgba(148, 163, 184, 0.2);
+      border-color: #64748b;
+      color: #cbd5e1;
+    }
+
+    .meta-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .tag {
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid #334155;
+      color: #cbd5e1;
+    }
+
+    .tag.visa {
+      background: rgba(34, 197, 94, 0.14);
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #86efac;
+    }
+
+    .tag.score {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #7dd3fc;
+    }
+
+    .tag.cyber {
+      background: rgba(129, 140, 248, 0.16);
+      border-color: rgba(129, 140, 248, 0.45);
+      color: #c7d2fe;
+    }
+
+    .job-desc {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #cbd5e1;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(51, 65, 85, 0.65);
+      font-size: 12px;
+    }
+
+    .visited-badge {
+      color: #86efac;
+      font-weight: 600;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      max-width: 780px;
+      width: 100%;
+      max-height: 86vh;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+    }
+
+    .weight-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px 20px;
+      background: var(--panel);
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 640px) {
+      .jobs-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Automotive Cybersecurity &amp; Product Visa Job Dashboard</h1>
+        <p class="subtitle">全球签证/搬迁支持岗位实时聚合 · Product Manager / Product Owner / VP Product · CSMS / R155 / VSOC / IDPS / ISO 21434 · 自学习推荐引擎</p>
+      </div>
+      <div class="header-actions">
+        <button id="refreshBtn" class="primary">立即刷新岗位</button>
+        <button id="learningBtn">自学习推荐引擎</button>
+        <button id="settingsBtn">数据源配置</button>
+      </div>
+    </header>
+
+    <div class="status-bar">
+      <div id="sourceStatusText">正在初始化数据源...</div>
+      <div id="refreshTimerText">自动刷新周期：每 3 小时</div>
+    </div>
+
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">当前展示岗位</div>
+        <div class="stat-value" id="statShown">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">原始抓取总数</div>
+        <div class="stat-value" id="statTotal">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">已标记「不相关」</div>
+        <div class="stat-value" id="statIrrelevant">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">已跳转原帖</div>
+        <div class="stat-value" id="statVisited">0</div>
+      </div>
+    </section>
+
+    <section class="filters-panel">
+      <div class="filter-row">
+        <input id="searchInput" type="text" placeholder="搜索岗位、公司、地点或技术关键词（如 CSMS, R155, VSOC, IDPS, 21434, Blue Card）..." />
+        <select id="regionFilter">
+          <option value="ALL">全部地区</option>
+          <option value="EU">欧洲（德/荷/爱/瑞/法/西/英/波）</option>
+          <option value="NA">北美（美国 / 加拿大）</option>
+          <option value="REMOTE">远程 / 全球</option>
+          <option value="OTHER">其他地区</option>
+        </select>
+        <select id="modeFilter">
+          <option value="ALL">全部工作形式</option>
+          <option value="Remote">Remote</option>
+          <option value="Hybrid">Hybrid</option>
+          <option value="On-site">On-site</option>
+        </select>
+        <select id="sortFilter">
+          <option value="SCORE">按自学习推荐分排序</option>
+          <option value="DATE">按最新发布时间排序</option>
+        </select>
+        <label style="font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+          <input id="visaOnlyCheckbox" type="checkbox" checked />
+          仅看签证/搬迁线索
+        </label>
+        <label style="font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+          <input id="showIrrelevantCheckbox" type="checkbox" />
+          显示「不相关」岗位
+        </label>
+      </div>
+
+      <div class="filter-row" id="quickKeywordsContainer">
+        <span class="chip-label">快捷关键词：</span>
+      </div>
+    </section>
+
+    <div class="board-links" id="externalBoardsBar"></div>
+
+    <main class="jobs-grid" id="jobsGrid">
+      <div class="empty-state">正在加载全球真实岗位数据，请稍候...</div>
+    </main>
+  </div>
+
+  <!-- 岗位详情抽屉/弹窗 -->
+  <div class="modal-backdrop" id="detailModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="detailTitle">岗位详情</h2>
+        <button id="closeDetailBtn">关闭</button>
+      </div>
+      <div id="detailMeta" class="meta-tags" style="margin-bottom: 12px;"></div>
+      <div id="detailBody" style="font-size: 13.5px; line-height: 1.65; color: #dbeafe; white-space: pre-wrap;"></div>
+      <div style="margin-top: 16px; display: flex; gap: 10px; justify-content: flex-end;">
+        <button id="detailIrrelevantBtn" class="irrelevant-btn">标记为「不相关」</button>
+        <a id="detailOriginalLink" href="#" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+          <button class="primary">打开原始招聘链接</button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 自学习推荐引擎弹窗 -->
+  <div class="modal-backdrop" id="learningModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>自学习推荐引擎（基于点击反馈）</h2>
+        <button id="closeLearningBtn">关闭</button>
+      </div>
+      <p style="font-size: 13px; color: var(--muted); margin-top: 0;">
+        点击卡片右上角<strong>「不相关」</strong>会降低对应岗位特征、公司、国家或工作形式的权重；点击跳转原帖会强化正样本特征，并动态调整推荐排序与外部检索词。
+      </p>
+      <div class="form-group">
+        <label>自适应检索词扩展预览</label>
+        <div id="adaptiveQueryPreview" style="padding: 10px; background: #0c1326; border: 1px solid var(--border); border-radius: 8px; font-size: 12.5px; color: #7dd3fc;"></div>
+      </div>
+      <div class="form-group">
+        <label>负样本降权特征（来自「不相关」标记，Top 20）</label>
+        <div id="negWeightsList" class="weight-list"></div>
+      </div>
+      <div class="form-group">
+        <label>正样本加权特征（来自跳转与高匹配交互，Top 20）</label>
+        <div id="posWeightsList" class="weight-list"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 16px;">
+        <button id="resetLearningBtn" style="border-color: rgba(239, 68, 68, 0.5); color: #fca5a5;">重置所有学习权重与「不相关」记录</button>
+        <button id="saveLearningCloseBtn" class="primary">完成</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据源配置弹窗 -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>数据源配置</h2>
+        <button id="closeSettingsBtn">关闭</button>
+      </div>
+      <div class="form-group">
+        <label>GitHub Actions / 外部 JSON Feed URL（每行一个，如 https://raw.githubusercontent.com/用户名/job-dashboard/main/jobs.json）</label>
+        <textarea id="customJsonFeedsInput" rows="3" placeholder="https://raw.githubusercontent.com/your-username/job-dashboard/main/jobs.json"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Greenhouse 公开 Board Token 列表（逗号或换行分隔，例如：rivian, polestar, mobileye）</label>
+        <input id="greenhouseBoardsInput" type="text" placeholder="rivian, polestar, mobileye" />
+      </div>
+      <div class="form-group">
+        <label>JSearch (RapidAPI) Key（可选，用于聚合 LinkedIn / Indeed 等多源结果）</label>
+        <input id="jsearchKeyInput" type="password" placeholder="可选填入 RapidAPI Key" />
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
+        <button id="saveSettingsBtn" class="primary">保存并重新拉取</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEYS = {
+      IRRELEVANT_IDS: 'acvj_irrelevant_ids_v1',
+      VISITED_IDS: 'acvj_visited_ids_v1',
+      LEARNING_STATE: 'acvj_learning_state_v1',
+      SETTINGS: 'acvj_settings_v1',
+      CACHED_JOBS: 'acvj_cached_jobs_v1'
+    };
+
+    const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
+
+    const QUICK_KEYWORDS = [
+      '全部',
+      'Product Manager',
+      'Product Owner',
+      'VP Product',
+      'Automotive Cybersecurity',
+      'CSMS',
+      'R155',
+      'VSOC',
+      'IDPS',
+      '21434'
+    ];
+
+    // 高价值领域词典（用于强化汽车网安 CSMS / R155 / VSOC / IDPS / 21434 + 产品负责人画像的正向先验权重）
+    const CORE_POSITIVE_TERMS = [
+      'automotive',
+      'cybersecurity',
+      'cyber security',
+      'product manager',
+      'product owner',
+      'vp product',
+      'head of product',
+      'csms',
+      'cyber security management system',
+      'r155',
+      'un r155',
+      'unece r155',
+      'vsoc',
+      'vehicle soc',
+      'vehicle security operations',
+      'idps',
+      'intrusion detection',
+      'intrusion prevention',
+      '21434',
+      'iso 21434',
+      'iso/sae 21434',
+      'vehicle',
+      'autonomous',
+      'mobility',
+      'security',
+      'visa',
+      'relocation',
+      'blue card'
+    ];
+
+    // 汽车网络安全核心细分术语扩展映射（用于快捷快筛、搜索匹配与推荐加权）
+    const AUTOMOTIVE_CYBER_VARIANTS = {
+      CSMS: ['csms', 'cyber security management system', 'cybersecurity management system'],
+      R155: ['r155', 'un r155', 'unece r155', 'r-155', 'r 155'],
+      VSOC: ['vsoc', 'vehicle soc', 'vehicle security operations center', 'vehicle security operations'],
+      IDPS: ['idps', 'intrusion detection', 'intrusion prevention', 'ids/ips', 'ids', 'ips'],
+      '21434': ['21434', 'iso 21434', 'iso/sae 21434', 'iso-21434', 'sae 21434']
+    };
+
+    const ROLE_MATCH_VARIANTS = {
+      'Product Manager': [
+        'product manager',
+        'senior product manager',
+        'staff product manager',
+        'principal product manager',
+        'lead product manager',
+        'technical product manager'
+      ],
+      'Product Owner': [
+        'product owner',
+        'senior product owner',
+        'lead product owner'
+      ],
+      'VP Product': [
+        'vp product',
+        'vp of product',
+        'vice president of product',
+        'vice president product',
+        'head of product',
+        'director of product'
+      ],
+      'Automotive Cybersecurity': [
+        'automotive cybersecurity',
+        'automotive cyber security',
+        'vehicle cybersecurity',
+        'vehicle cyber security',
+        'connected car security',
+        'automotive security'
+      ]
+    };
+
+    const VISA_SIGNAL_TERMS = [
+      'visa sponsorship',
+      'visa support',
+      'work visa',
+      'work permit',
+      'relocation',
+      'relocation assistance',
+      'relocation package',
+      'blue card',
+      'eu blue card',
+      'h-1b',
+      'h1b',
+      'o-1',
+      'o1',
+      'lmia',
+      'global talent',
+      'skilled worker',
+      'sponsor visa',
+      'sponsorship available'
+    ];
+
+    const DEFAULT_GREENHOUSE_BOARDS = ['rivian', 'polestar', 'mobileye', 'aurora', 'appliedintuition'];
+
+    function normalizeSearchText(input) {
+      return String(input || '')
+        .toLowerCase()
+        .replace(/[\/\-_]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function includesTerm(haystackRaw, termRaw) {
+      const haystack = ` ${normalizeSearchText(haystackRaw)} `;
+      const term = normalizeSearchText(termRaw);
+      if (!term) return false;
+      if (/^\d+$/.test(term)) {
+        return new RegExp(`(^|[^a-z0-9])${term}([^a-z0-9]|$)`).test(haystack);
+      }
+      return haystack.includes(term);
+    }
+
+    function expandKeywordVariants(keyword) {
+      const clean = String(keyword || '').trim();
+      if (!clean || clean === '全部') return [];
+      if (AUTOMOTIVE_CYBER_VARIANTS[clean]) {
+        return AUTOMOTIVE_CYBER_VARIANTS[clean];
+      }
+      if (ROLE_MATCH_VARIANTS[clean]) {
+        return ROLE_MATCH_VARIANTS[clean];
+      }
+      return [clean.toLowerCase()];
+    }
+
+    /**
+     * 规范化并评估单条真实岗位的关键词匹配、签证支持与基础推荐分
+     */
+    function evaluateJobListing(job, learningState = {}) {
+      const title = String(job.title || '').trim();
+      const company = String(job.company || '').trim();
+      const location = String(job.location || '').trim();
+      const description = String(job.description || job.jd || '').trim();
+      const responsibilities = String(job.responsibilities || '').trim();
+      const tags = Array.isArray(job.tags) ? job.tags.join(' ') : String(job.tags || '');
+
+      const titleNorm = normalizeSearchText(title);
+      const fullText = `${title} ${company} ${location} ${tags} ${description} ${responsibilities}`;
+      const fullNorm = normalizeSearchText(fullText);
+
+      // 1. 签证 / 搬迁 / 工签担保识别
+      const matchedVisaTerms = VISA_SIGNAL_TERMS.filter(term => fullNorm.includes(normalizeSearchText(term)));
+      const hasVisaSupport = Boolean(
+        job.visaSponsored === true ||
+        job.hasVisaSupport === true ||
+        matchedVisaTerms.length > 0
+      );
+
+      // 2. 匹配 5 大车载网安核心术语及扩展变体
+      const matchedCyberPillars = Object.keys(AUTOMOTIVE_CYBER_VARIANTS).filter(pillar =>
+        AUTOMOTIVE_CYBER_VARIANTS[pillar].some(variant => includesTerm(fullNorm, variant))
+      );
+
+      // 3. 匹配产品负责人角色画像
+      const matchedRoleKeywords = Object.keys(ROLE_MATCH_VARIANTS).filter(role =>
+        ROLE_MATCH_VARIANTS[role].some(variant => includesTerm(fullNorm, variant))
+      );
+
+      // 4. 匹配 CORE_POSITIVE_TERMS 高价值领域词典
+      const matchedPositiveTerms = CORE_POSITIVE_TERMS.filter(term => includesTerm(fullNorm, term));
+
+      // 5. 计算基础推荐分（最高 100 分，可与自学习权重叠加）
+      let score = 15;
+      if (hasVisaSupport) score += 25;
+      if (matchedRoleKeywords.length > 0) {
+        score +=
+          includesTerm(titleNorm, 'product manager') ||
+          includesTerm(titleNorm, 'product owner') ||
+          includesTerm(titleNorm, 'vp product') ||
+          includesTerm(titleNorm, 'head of product')
+            ? 22
+            : 14;
+      }
+      if (includesTerm(fullNorm, 'automotive') || includesTerm(fullNorm, 'vehicle') || includesTerm(fullNorm, 'autonomous')) {
+        score += 12;
+      }
+      if (includesTerm(fullNorm, 'cybersecurity') || includesTerm(fullNorm, 'cyber security') || includesTerm(fullNorm, 'security')) {
+        score += 10;
+      }
+      // 5 大核心点（CSMS / R155 / VSOC / IDPS / 21434）专项加分
+      score += Math.min(20, matchedCyberPillars.length * 7);
+      score += Math.min(10, matchedPositiveTerms.length * 1.5);
+
+      // 6. 结合自学习引擎的词/公司/国家/模式正负权重修正
+      const posWeights = learningState.positiveWeights || {};
+      const negWeights = learningState.negativeWeights || {};
+      let learningAdjustment = 0;
+
+      for (const [token, weight] of Object.entries(posWeights)) {
+        if (includesTerm(fullNorm, token)) {
+          learningAdjustment += Number(weight) || 0;
+        }
+      }
+      for (const [token, weight] of Object.entries(negWeights)) {
+        if (includesTerm(fullNorm, token)) {
+          learningAdjustment -= Number(weight) || 0;
+        }
+      }
+
+      const finalScore = Math.max(0, Math.min(100, Math.round(score + learningAdjustment)));
+
+      const matchedKeywords = Array.from(
+        new Set([
+          ...matchedRoleKeywords,
+          ...matchedCyberPillars,
+          ...(includesTerm(fullNorm, 'automotive') && includesTerm(fullNorm, 'security')
+            ? ['Automotive Cybersecurity']
+            : [])
+        ])
+      );
+
+      return {
+        ...job,
+        hasVisaSupport,
+        matchedVisaTerms,
+        matchedCyberPillars,
+        matchedRoleKeywords,
+        matchedPositiveTerms,
+        matchedKeywords,
+        baseScore: Math.min(100, Math.round(score)),
+        learningAdjustment: Math.round(learningAdjustment * 10) / 10,
+        recommendationScore: finalScore,
+        isCoreTarget:
+          hasVisaSupport &&
+          (matchedRoleKeywords.length > 0 ||
+            matchedCyberPillars.length > 0 ||
+            (includesTerm(fullNorm, 'automotive') && includesTerm(fullNorm, 'security')))
+      };
+    }
+
+    function loadJsonStorage(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (_) {
+        return fallback;
+      }
+    }
+
+    function saveJsonStorage(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (_) {}
+    }
+
+    let state = {
+      jobs: [],
+      selectedKeyword: '全部',
+      searchQuery: '',
+      region: 'ALL',
+      mode: 'ALL',
+      sortBy: 'SCORE',
+      visaOnly: true,
+      showIrrelevant: false,
+      activeDetailId: null,
+      irrelevantIds: loadJsonStorage(STORAGE_KEYS.IRRELEVANT_IDS, []),
+      visitedIds: loadJsonStorage(STORAGE_KEYS.VISITED_IDS, []),
+      learning: loadJsonStorage(STORAGE_KEYS.LEARNING_STATE, {
+        positiveWeights: {},
+        negativeWeights: {}
+      }),
+      settings: loadJsonStorage(STORAGE_KEYS.SETTINGS, {
+        customJsonFeeds: [],
+        greenhouseBoards: DEFAULT_GREENHOUSE_BOARDS,
+        jsearchKey: ''
+      })
+    };
+
+    function detectRegion(locationStr = '') {
+      const loc = locationStr.toLowerCase();
+      if (/germany|deutschland|munich|münchen|berlin|stuttgart|wolfsburg|netherlands|amsterdam|eindhoven|ireland|dublin|sweden|stockholm|gothenburg|france|paris|spain|madrid|barcelona|uk|united kingdom|london|poland|warsaw|europe|eu\b/.test(loc)) {
+        return 'EU';
+      }
+      if (/united states|usa|\bus\b|canada|toronto|vancouver|montreal|michigan|detroit|california|austin|seattle|new york/.test(loc)) {
+        return 'NA';
+      }
+      if (/remote|worldwide|global|anywhere/.test(loc)) {
+        return 'REMOTE';
+      }
+      return 'OTHER';
+    }
+
+    function detectWorkMode(job) {
+      const text = `${job.title || ''} ${job.location || ''} ${job.workMode || ''}`.toLowerCase();
+      if (text.includes('remote')) return 'Remote';
+      if (text.includes('hybrid')) return 'Hybrid';
+      if (text.includes('on-site') || text.includes('onsite') || text.includes('on site')) return 'On-site';
+      return job.workMode || 'Hybrid';
+    }
+
+    function stripHtml(html = '') {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      return (div.textContent || div.innerText || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function extractFeaturesForLearning(job) {
+      const titleTokens = normalizeSearchText(job.title)
+        .split(' ')
+        .filter(w => w.length >= 3 && !['the', 'and', 'for', 'with', 'role', 'job', 'senior', 'lead'].includes(w));
+      const companyKey = job.company ? `company:${job.company.toLowerCase().trim()}` : null;
+      const regionKey = `region:${detectRegion(job.location)}`;
+      return Array.from(new Set([...titleTokens.slice(0, 6), companyKey, regionKey].filter(Boolean)));
+    }
+
+    function toggleIrrelevant(jobId) {
+      const job = state.jobs.find(j => j.id === jobId);
+      const exists = state.irrelevantIds.includes(jobId);
+
+      if (exists) {
+        state.irrelevantIds = state.irrelevantIds.filter(id => id !== jobId);
+      } else {
+        state.irrelevantIds.push(jobId);
+        if (job) {
+          const features = extractFeaturesForLearning(job);
+          features.forEach(feat => {
+            state.learning.negativeWeights[feat] = Math.min(25, (state.learning.negativeWeights[feat] || 0) + 2.5);
+          });
+        }
+      }
+
+      saveJsonStorage(STORAGE_KEYS.IRRELEVANT_IDS, state.irrelevantIds);
+      saveJsonStorage(STORAGE_KEYS.LEARNING_STATE, state.learning);
+      reScoreAndRender();
+    }
+
+    function markVisited(jobId) {
+      if (!jobId || state.visitedIds.includes(jobId)) return;
+      state.visitedIds.push(jobId);
+      const job = state.jobs.find(j => j.id === jobId);
+      if (job) {
+        const features = extractFeaturesForLearning(job);
+        features.forEach(feat => {
+          state.learning.positiveWeights[feat] = Math.min(20, (state.learning.positiveWeights[feat] || 0) + 1.5);
+        });
+      }
+      saveJsonStorage(STORAGE_KEYS.VISITED_IDS, state.visitedIds);
+      saveJsonStorage(STORAGE_KEYS.LEARNING_STATE, state.learning);
+      reScoreAndRender();
+    }
+
+    function buildAdaptiveSearchQuery() {
+      const baseTerms = state.selectedKeyword && state.selectedKeyword !== '全部'
+        ? [state.selectedKeyword]
+        : ['Product Manager', 'Automotive Cybersecurity', 'CSMS', 'R155', 'VSOC', 'IDPS', '21434'];
+
+      const negEntries = Object.entries(state.learning.negativeWeights || {})
+        .filter(([k]) => !k.startsWith('company:') && !k.startsWith('region:'))
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 4)
+        .map(([k]) => `-${k}`);
+
+      const posEntries = Object.entries(state.learning.positiveWeights || {})
+        .filter(([k]) => !k.startsWith('company:') && !k.startsWith('region:'))
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([k]) => k);
+
+      return `${baseTerms.join(' ')} ${posEntries.join(' ')} ${negEntries.join(' ')} visa relocation`.trim();
+    }
+
+    function renderExternalBoards() {
+      const q = encodeURIComponent(buildAdaptiveSearchQuery());
+      const boards = [
+        { name: 'LinkedIn Jobs', url: `https://www.linkedin.com/jobs/search/?keywords=${q}` },
+        { name: 'Indeed Global', url: `https://www.indeed.com/jobs?q=${q}` },
+        { name: 'Canada Job Bank', url: `https://www.jobbank.gc.ca/jobsearch/jobsearch?searchstring=${q}` },
+        { name: 'StepStone DE (蓝卡/汽车)', url: `https://www.stepstone.de/jobs/${encodeURIComponent(state.selectedKeyword === '全部' ? 'Automotive Cybersecurity Product Manager' : state.selectedKeyword)}.html` },
+        { name: 'EuroJobsites / EU', url: `https://www.eurojobsites.com/search-jobs/?keywords=${q}` }
+      ];
+
+      const bar = document.getElementById('externalBoardsBar');
+      bar.innerHTML = boards
+        .map(b => `<a class="board-link" href="${b.url}" target="_blank" rel="noopener noreferrer">${b.name} ↗</a>`)
+        .join('');
+    }
+
+    function renderQuickKeywords() {
+      const container = document.getElementById('quickKeywordsContainer');
+      const labelHtml = '<span class="chip-label">快捷关键词：</span>';
+      const chipsHtml = QUICK_KEYWORDS.map(kw => {
+        const activeClass = state.selectedKeyword === kw ? 'active-chip' : '';
+        return `<button class="${activeClass}" data-kw="${kw}">${kw}</button>`;
+      }).join('');
+      container.innerHTML = labelHtml + chipsHtml;
+
+      container.querySelectorAll('button[data-kw]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.selectedKeyword = btn.getAttribute('data-kw');
+          renderQuickKeywords();
+          renderExternalBoards();
+          renderJobs();
+        });
+      });
+    }
+
+    function reScoreAndRender() {
+      state.jobs = state.jobs.map(job => evaluateJobListing(job, state.learning));
+      renderExternalBoards();
+      renderJobs();
+    }
+
+    function getFilteredJobs() {
+      const q = normalizeSearchText(state.searchQuery);
+      const selectedVariants = expandKeywordVariants(state.selectedKeyword);
+
+      const list = state.jobs.filter(job => {
+        const isIrrelevant = state.irrelevantIds.includes(job.id);
+        if (isIrrelevant && !state.showIrrelevant) return false;
+
+        if (state.visaOnly && !job.hasVisaSupport) return false;
+
+        if (state.region !== 'ALL' && detectRegion(job.location) !== state.region) return false;
+
+        if (state.mode !== 'ALL' && detectWorkMode(job) !== state.mode) return false;
+
+        const haystack = `${job.title || ''} ${job.company || ''} ${job.location || ''} ${job.description || ''} ${job.responsibilities || ''} ${(job.tags || []).join(' ')}`;
+
+        if (selectedVariants.length > 0) {
+          const matchesChip = selectedVariants.some(v => includesTerm(haystack, v));
+          if (!matchesChip) return false;
+        }
+
+        if (q) {
+          const tokens = q.split(' ').filter(Boolean);
+          const matchesSearch = tokens.every(tok => includesTerm(haystack, tok));
+          if (!matchesSearch) return false;
+        }
+
+        return true;
+      });
+
+      if (state.sortBy === 'DATE') {
+        list.sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
+      } else {
+        list.sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0));
+      }
+
+      return list;
+    }
+
+    function renderJobs() {
+      const filtered = getFilteredJobs();
+      const grid = document.getElementById('jobsGrid');
+
+      document.getElementById('statShown').textContent = String(filtered.length);
+      document.getElementById('statTotal').textContent = String(state.jobs.length);
+      document.getElementById('statIrrelevant').textContent = String(state.irrelevantIds.length);
+      document.getElementById('statVisited').textContent = String(state.visitedIds.length);
+
+      if (!filtered.length) {
+        grid.innerHTML = `<div class="empty-state">当前筛选条件下暂无匹配岗位。可尝试切换快捷关键词、取消「仅看签证/搬迁线索」或点击「立即刷新岗位」。</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered
+        .map(job => {
+          const isIrrelevant = state.irrelevantIds.includes(job.id);
+          const isVisited = state.visitedIds.includes(job.id);
+          const mode = detectWorkMode(job);
+          const cyberTags = (job.matchedCyberPillars || [])
+            .map(p => `<span class="tag cyber">${p}</span>`)
+            .join('');
+
+          return `
+            <article class="job-card ${isIrrelevant ? 'irrelevant' : ''}">
+              <div>
+                <div class="card-top">
+                  <div>
+                    <h3 class="job-title">${escapeHtml(job.title || '未命名岗位')}</h3>
+                    <div class="job-company">${escapeHtml(job.company || '未知企业')}</div>
+                  </div>
+                  <button class="irrelevant-btn ${isIrrelevant ? 'active' : ''}" data-irrelevant-id="${escapeAttr(job.id)}">
+                    ${isIrrelevant ? '已标不相关 · 撤销' : '不相关'}
+                  </button>
+                </div>
+
+                <div class="meta-tags" style="margin-top: 10px;">
+                  <span class="tag score">推荐分 ${job.recommendationScore ?? 0}</span>
+                  <span class="tag">${escapeHtml(job.location || '未注明地点')}</span>
+                  <span class="tag">${escapeHtml(mode)}</span>
+                  ${job.hasVisaSupport ? '<span class="tag visa">签证/搬迁线索</span>' : ''}
+                  ${cyberTags}
+                </div>
+
+                <p class="job-desc" style="margin-top: 10px;">${escapeHtml(stripHtml(job.description || job.responsibilities || '暂无详细描述，请点击查看详情或跳转原帖。'))}</p>
+              </div>
+
+              <div class="card-footer">
+                <div>
+                  ${job.salary ? `<span style="color:#fde68a;margin-right:8px;">${escapeHtml(job.salary)}</span>` : ''}
+                  ${isVisited ? '<span class="visited-badge">✓ 已跳转原帖</span>' : `<span style="color:var(--muted);">来源：${escapeHtml(job.source || '公开接口')}</span>`}
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <button data-detail-id="${escapeAttr(job.id)}">详情</button>
+                  <a href="${escapeAttr(job.url || '#')}" target="_blank" rel="noopener noreferrer" data-visit-id="${escapeAttr(job.id)}" style="text-decoration:none;">
+                    <button class="primary">投递/原帖 ↗</button>
+                  </a>
+                </div>
+              </div>
+            </article>
+          `;
+        })
+        .join('');
+
+      grid.querySelectorAll('button[data-irrelevant-id]').forEach(btn => {
+        btn.addEventListener('click', () => toggleIrrelevant(btn.getAttribute('data-irrelevant-id')));
+      });
+
+      grid.querySelectorAll('button[data-detail-id]').forEach(btn => {
+        btn.addEventListener('click', () => openDetailModal(btn.getAttribute('data-detail-id')));
+      });
+
+      grid.querySelectorAll('a[data-visit-id]').forEach(link => {
+        link.addEventListener('click', () => markVisited(link.getAttribute('data-visit-id')));
+      });
+    }
+
+    function openDetailModal(jobId) {
+      const job = state.jobs.find(j => j.id === jobId);
+      if (!job) return;
+      state.activeDetailId = jobId;
+
+      document.getElementById('detailTitle').textContent = `${job.title || ''} — ${job.company || ''}`;
+      document.getElementById('detailMeta').innerHTML = `
+        <span class="tag score">推荐分 ${job.recommendationScore ?? 0}（基础 ${job.baseScore ?? 0} / 学习修正 ${job.learningAdjustment >= 0 ? '+' : ''}${job.learningAdjustment ?? 0}）</span>
+        <span class="tag">${escapeHtml(job.location || '')}</span>
+        <span class="tag">${escapeHtml(detectWorkMode(job))}</span>
+        ${(job.matchedCyberPillars || []).map(p => `<span class="tag cyber">${p}</span>`).join('')}
+      `;
+      document.getElementById('detailBody').textContent = stripHtml(job.description || job.responsibilities || '暂无完整描述。');
+      const linkEl = document.getElementById('detailOriginalLink');
+      linkEl.href = job.url || '#';
+      linkEl.onclick = () => markVisited(job.id);
+
+      const irrBtn = document.getElementById('detailIrrelevantBtn');
+      const isIrr = state.irrelevantIds.includes(job.id);
+      irrBtn.textContent = isIrr ? '已标不相关 · 撤销' : '标记为「不相关」';
+      irrBtn.onclick = () => {
+        toggleIrrelevant(job.id);
+        openDetailModal(job.id);
+      };
+
+      document.getElementById('detailModal').classList.add('open');
+    }
+
+    function openLearningModal() {
+      document.getElementById('adaptiveQueryPreview').textContent = buildAdaptiveSearchQuery();
+
+      const negEntries = Object.entries(state.learning.negativeWeights || {})
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 20);
+      document.getElementById('negWeightsList').innerHTML = negEntries.length
+        ? negEntries.map(([k, v]) => `<span class="tag">${escapeHtml(k)} (-${Number(v).toFixed(1)})</span>`).join('')
+        : '<span style="color:var(--muted);font-size:12px;">暂无负样本降权记录，点击卡片右上角「不相关」即可开始学习。</span>';
+
+      const posEntries = Object.entries(state.learning.positiveWeights || {})
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 20);
+      document.getElementById('posWeightsList').innerHTML = posEntries.length
+        ? posEntries.map(([k, v]) => `<span class="tag visa">${escapeHtml(k)} (+${Number(v).toFixed(1)})</span>`).join('')
+        : '<span style="color:var(--muted);font-size:12px;">暂无正样本加权记录，点击岗位跳转原帖即可强化匹配。</span>';
+
+      document.getElementById('learningModal').classList.add('open');
+    }
+
+    async function fetchArbeitnowJobs() {
+      try {
+        const res = await fetch('https://www.arbeitnow.com/api/job-board-api');
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.data || []).map((item, idx) => ({
+          id: `arbeitnow-${item.slug || idx}`,
+          title: item.title,
+          company: item.company_name,
+          location: item.location,
+          workMode: item.remote ? 'Remote' : 'Hybrid',
+          description: item.description || '',
+          tags: item.tags || [],
+          url: item.url,
+          publishedAt: item.created_at ? new Date(item.created_at * 1000).toISOString() : new Date().toISOString(),
+          source: 'Arbeitnow'
+        }));
+      } catch (_) {
+        return [];
+      }
+    }
+
+    async function fetchRemotiveJobs() {
+      try {
+        const res = await fetch('https://remotive.com/api/remote-jobs?limit=80');
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.jobs || []).map(item => ({
+          id: `remotive-${item.id}`,
+          title: item.title,
+          company: item.company_name,
+          location: item.candidate_required_location || 'Worldwide Remote',
+          workMode: 'Remote',
+          salary: item.salary || '',
+          description: item.description || '',
+          tags: item.tags || [],
+          url: item.url,
+          publishedAt: item.publication_date || new Date().toISOString(),
+          source: 'Remotive'
+        }));
+      } catch (_) {
+        return [];
+      }
+    }
+
+    async function fetchGreenhouseBoard(token) {
+      const cleanToken = String(token || '').trim();
+      if (!cleanToken) return [];
+      try {
+        const res = await fetch(`https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(cleanToken)}/jobs?content=true`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.jobs || []).map(item => ({
+          id: `gh-${cleanToken}-${item.id}`,
+          title: item.title,
+          company: cleanToken.toUpperCase(),
+          location: item.location?.name || '',
+          description: item.content || '',
+          url: item.absolute_url,
+          publishedAt: item.updated_at || new Date().toISOString(),
+          source: `Greenhouse:${cleanToken}`
+        }));
+      } catch (_) {
+        return [];
+      }
+    }
+
+    async function fetchCustomJsonFeeds(urls = []) {
+      const results = [];
+      for (const rawUrl of urls) {
+        const url = String(rawUrl || '').trim();
+        if (!url) continue;
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const payload = await res.json();
+          const items = Array.isArray(payload) ? payload : (payload.jobs || []);
+          items.forEach((item, idx) => {
+            results.push({
+              id: item.id || `feed-${btoa(unescape(encodeURIComponent(url))).slice(0, 8)}-${idx}`,
+              title: item.title,
+              company: item.company || item.company_name || 'External Feed',
+              location: item.location || '',
+              workMode: item.workMode || item.work_mode || '',
+              salary: item.salary || '',
+              description: item.description || item.jd || '',
+              responsibilities: item.responsibilities || '',
+              visaSponsored: Boolean(item.visaSponsored ?? item.visa_sponsored ?? item.hasVisaSupport),
+              url: item.url || item.apply_url || '#',
+              publishedAt: item.publishedAt || item.published_at || new Date().toISOString(),
+              source: item.source || 'CustomJSON'
+            });
+          });
+        } catch (_) {}
+      }
+      return results;
+    }
+
+    async function refreshAllJobs(forceNetwork = true) {
+      const cached = loadJsonStorage(STORAGE_KEYS.CACHED_JOBS, null);
+      if (!forceNetwork && cached && cached.jobs?.length && (Date.now() - cached.timestamp) < THREE_HOURS_MS) {
+        state.jobs = cached.jobs.map(j => evaluateJobListing(j, state.learning));
+        document.getElementById('sourceStatusText').textContent = `已加载 3 小时内缓存（${state.jobs.length} 条）· 更新于 ${new Date(cached.timestamp).toLocaleTimeString()}`;
+        renderJobs();
+        return;
+      }
+
+      document.getElementById('sourceStatusText').textContent = '正在从公开数据源拉取最新岗位...';
+
+      const boards = state.settings.greenhouseBoards || DEFAULT_GREENHOUSE_BOARDS;
+      const tasks = [
+        fetchArbeitnowJobs(),
+        fetchRemotiveJobs(),
+        ...boards.map(b => fetchGreenhouseBoard(b)),
+        fetchCustomJsonFeeds(state.settings.customJsonFeeds || [])
+      ];
+
+      const batches = await Promise.all(tasks);
+      const merged = [];
+      const seen = new Set();
+
+      for (const batch of batches) {
+        for (const item of batch) {
+          if (!item || !item.title) continue;
+          const dedupKey = `${normalizeSearchText(item.title)}|${normalizeSearchText(item.company)}|${normalizeSearchText(item.location)}`;
+          if (seen.has(dedupKey)) continue;
+          seen.add(dedupKey);
+          merged.push(item);
+        }
+      }
+
+      if (merged.length > 0) {
+        saveJsonStorage(STORAGE_KEYS.CACHED_JOBS, { timestamp: Date.now(), jobs: merged });
+        state.jobs = merged.map(j => evaluateJobListing(j, state.learning));
+        document.getElementById('sourceStatusText').textContent = `已同步 ${state.jobs.length} 条去重岗位 · 更新于 ${new Date().toLocaleTimeString()}`;
+      } else if (cached?.jobs?.length) {
+        state.jobs = cached.jobs.map(j => evaluateJobListing(j, state.learning));
+        document.getElementById('sourceStatusText').textContent = `外部接口暂无返回，已回退至本地缓存（${state.jobs.length} 条）`;
+      } else {
+        state.jobs = [];
+        document.getElementById('sourceStatusText').textContent = '外部接口暂未返回数据，请检查网络或配置 JSON Feed / Greenhouse Token';
+      }
+
+      renderJobs();
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(str) {
+      return escapeHtml(str).replace(/'/g, '&#39;');
+    }
+
+    function bindEvents() {
+      document.getElementById('refreshBtn').addEventListener('click', () => refreshAllJobs(true));
+
+      document.getElementById('searchInput').addEventListener('input', e => {
+        state.searchQuery = e.target.value;
+        renderJobs();
+      });
+
+      document.getElementById('regionFilter').addEventListener('change', e => {
+        state.region = e.target.value;
+        renderJobs();
+      });
+
+      document.getElementById('modeFilter').addEventListener('change', e => {
+        state.mode = e.target.value;
+        renderJobs();
+      });
+
+      document.getElementById('sortFilter').addEventListener('change', e => {
+        state.sortBy = e.target.value;
+        renderJobs();
+      });
+
+      document.getElementById('visaOnlyCheckbox').addEventListener('change', e => {
+        state.visaOnly = e.target.checked;
+        renderJobs();
+      });
+
+      document.getElementById('showIrrelevantCheckbox').addEventListener('change', e => {
+        state.showIrrelevant = e.target.checked;
+        renderJobs();
+      });
+
+      document.getElementById('closeDetailBtn').addEventListener('click', () => {
+        document.getElementById('detailModal').classList.remove('open');
+      });
+
+      document.getElementById('learningBtn').addEventListener('click', openLearningModal);
+      document.getElementById('closeLearningBtn').addEventListener('click', () => {
+        document.getElementById('learningModal').classList.remove('open');
+      });
+      document.getElementById('saveLearningCloseBtn').addEventListener('click', () => {
+        document.getElementById('learningModal').classList.remove('open');
+      });
+
+      document.getElementById('resetLearningBtn').addEventListener('click', () => {
+        state.irrelevantIds = [];
+        state.visitedIds = [];
+        state.learning = { positiveWeights: {}, negativeWeights: {} };
+        saveJsonStorage(STORAGE_KEYS.IRRELEVANT_IDS, []);
+        saveJsonStorage(STORAGE_KEYS.VISITED_IDS, []);
+        saveJsonStorage(STORAGE_KEYS.LEARNING_STATE, state.learning);
+        reScoreAndRender();
+        openLearningModal();
+      });
+
+      document.getElementById('settingsBtn').addEventListener('click', () => {
+        document.getElementById('customJsonFeedsInput').value = (state.settings.customJsonFeeds || []).join('\n');
+        document.getElementById('greenhouseBoardsInput').value = (state.settings.greenhouseBoards || []).join(', ');
+        document.getElementById('jsearchKeyInput').value = state.settings.jsearchKey || '';
+        document.getElementById('settingsModal').classList.add('open');
+      });
+
+      document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+        document.getElementById('settingsModal').classList.remove('open');
+      });
+
+      document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+        const feeds = document.getElementById('customJsonFeedsInput').value
+          .split(/\r?\n/)
+          .map(s => s.trim())
+          .filter(Boolean);
+        const boards = document.getElementById('greenhouseBoardsInput').value
+          .split(/[\s,]+/)
+          .map(s => s.trim())
+          .filter(Boolean);
+        const jsearchKey = document.getElementById('jsearchKeyInput').value.trim();
+
+        state.settings = { customJsonFeeds: feeds, greenhouseBoards: boards, jsearchKey };
+        saveJsonStorage(STORAGE_KEYS.SETTINGS, state.settings);
+        document.getElementById('settingsModal').classList.remove('open');
+        refreshAllJobs(true);
+      });
+
+      setInterval(() => {
+        refreshAllJobs(true);
+      }, THREE_HOURS_MS);
+    }
+
+    renderQuickKeywords();
+    renderExternalBoards();
+    bindEvents();
+    refreshAllJobs(false);
+  </script>
+</body>
+</html>
