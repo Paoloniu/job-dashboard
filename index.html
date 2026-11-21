@@ -1,0 +1,268 @@
+<!-- ... existing code ... -->
+      <!-- 快捷关键词胶囊 -->
+      <div class="flex flex-wrap items-center gap-1.5 pt-0.5 text-xs">
+        <span class="text-[11px] font-medium text-slate-500 mr-1">快捷关键词：</span>
+        <button type="button" data-kw="ALL" class="kw-chip rounded-full bg-slate-800 px-3 py-1 text-[11px] font-semibold text-white">全部</button>
+        <button type="button" data-kw="Product Manager" class="kw-chip rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-medium text-slate-700 hover:border-blue-300">Product Manager</button>
+        <button type="button" data-kw="Product Owner" class="kw-chip rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-medium text-slate-700 hover:border-blue-300">Product Owner</button>
+        <button type="button" data-kw="VP Product" class="kw-chip rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-medium text-slate-700 hover:border-blue-300">VP Product</button>
+        <button type="button" data-kw="Automotive" class="kw-chip rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-medium text-slate-700 hover:border-blue-300">Automotive</button>
+        <button type="button" data-kw="Cybersecurity" class="kw-chip rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-medium text-slate-700 hover:border-blue-300">Cybersecurity</button>
+        <button type="button" data-kw="CSMS" class="kw-chip rounded-full border border-indigo-200 bg-indigo-50/70 px-3 py-1 text-[11px] font-semibold text-indigo-800 hover:border-indigo-400">CSMS</button>
+        <button type="button" data-kw="R155" class="kw-chip rounded-full border border-indigo-200 bg-indigo-50/70 px-3 py-1 text-[11px] font-semibold text-indigo-800 hover:border-indigo-400">R155</button>
+        <button type="button" data-kw="VSOC" class="kw-chip rounded-full border border-indigo-200 bg-indigo-50/70 px-3 py-1 text-[11px] font-semibold text-indigo-800 hover:border-indigo-400">VSOC</button>
+        <button type="button" data-kw="IDPS" class="kw-chip rounded-full border border-indigo-200 bg-indigo-50/70 px-3 py-1 text-[11px] font-semibold text-indigo-800 hover:border-indigo-400">IDPS</button>
+        <button type="button" data-kw="21434" class="kw-chip rounded-full border border-indigo-200 bg-indigo-50/70 px-3 py-1 text-[11px] font-semibold text-indigo-800 hover:border-indigo-400">21434</button>
+      </div>
+    </div>
+  </section>
+<!-- ... existing code ... -->
+    // 高价值领域词典（用于强化汽车网安 CSMS / R155 / VSOC / IDPS / 21434 + 产品负责人画像的正向先验权重）
+    const CORE_POSITIVE_TERMS = [
+      'automotive',
+      'cybersecurity',
+      'cyber security',
+      'product manager',
+      'product owner',
+      'vp product',
+      'head of product',
+      'csms',
+      'cyber security management system',
+      'r155',
+      'un r155',
+      'unece r155',
+      'vsoc',
+      'vehicle soc',
+      'vehicle security operations',
+      'idps',
+      'intrusion detection',
+      'intrusion prevention',
+      '21434',
+      'iso 21434',
+      'iso/sae 21434',
+      'vehicle',
+      'autonomous',
+      'mobility',
+      'security',
+      'visa',
+      'relocation',
+      'blue card'
+    ];
+
+    // 汽车网络安全核心细分术语扩展映射（用于快捷快筛、搜索匹配与推荐加权）
+    const AUTOMOTIVE_CYBER_VARIANTS = {
+      CSMS: ['csms', 'cyber security management system', 'cybersecurity management system'],
+      R155: ['r155', 'un r155', 'unece r155', 'r-155', 'r 155'],
+      VSOC: ['vsoc', 'vehicle soc', 'vehicle security operations center', 'vehicle security operations'],
+      IDPS: ['idps', 'intrusion detection', 'intrusion prevention', 'ids/ips', 'ids', 'ips'],
+      '21434': ['21434', 'iso 21434', 'iso/sae 21434', 'iso-21434', 'sae 21434']
+    };
+<!-- ... existing code ... -->
+    /**
+     * 规范化并评估单条真实岗位的关键词匹配、签证支持与基础推荐分
+     */
+    function evaluateAndNormalizeJob(rawJob) {
+      const title = (rawJob.title || '').trim();
+      const company = (rawJob.company || 'Unknown Company').trim();
+      const location = (rawJob.location || 'Europe / Global').trim();
+      const country = normalizeCountry(rawJob.country || location, location);
+      const source = rawJob.source || 'Live API';
+      const url = rawJob.url || '#';
+      const htmlDesc = rawJob.htmlDesc || '';
+      const plainSummary = htmlToPlainText(htmlDesc || rawJob.summary || title);
+      const responsibilities = extractResponsibilities(htmlDesc, plainSummary);
+      const workMode = normalizeWorkMode(rawJob.workMode || `${title} ${location} ${plainSummary}`);
+      const workModeLabel = formatWorkModeLabel(workMode);
+      const salary = normalizeSalary(rawJob.salary || `${title} ${plainSummary}`);
+      const applicants = rawJob.applicants || '平台未公开';
+      const publishedAtMs = parseTimestampMs(rawJob.publishedAt);
+      const publishedLabel = formatRelativeTime(publishedAtMs);
+
+      const haystack = `${title} ${company} ${location} ${country} ${plainSummary} ${(rawJob.tags || []).join(' ')}`.toLowerCase();
+
+      const hasRoleMatch =
+        /\b(product\s*manager|product\s*owner|vp\s*(of\s*)?product|head\s*of\s*product|director\s*of\s*product)\b/i.test(title) ||
+        /\b(product\s*manager|product\s*owner|vp\s*(of\s*)?product|head\s*of\s*product)\b/i.test(haystack);
+
+      const hasAutomotiveCyberMatch =
+        /\b(automotive|vehicle|connected\s*car|autonomous|mobility|iso\s*\/?\s*sae\s*21434|21434|un\s*r155|unece\s*r155|r155|csms|vsoc|vehicle\s*soc|idps|intrusion\s*detection|intrusion\s*prevention)\b/i.test(haystack) ||
+        /\b(cyber\s*security|cybersecurity|information\s*security|application\s*security|cloud\s*security|product\s*security|security\s*engineer|security\s*architect)\b/i.test(haystack);
+
+      const hasVisaOrRelocation =
+        rawJob.visaConfirmed === true ||
+        /\b(visa|sponsorship|sponsor|relocation|relocate|eu\s*blue\s*card|blue\s*card|work\s*permit|critical\s*skills|skilled\s*worker|hsm|kennismigrant|lmia|gts|global\s*talent|straight\s*to\s*residence)\b/i.test(haystack) ||
+        source.includes('Arbeitnow');
+
+      const matchedTags = [];
+      if (/\b(product\s*manager|senior\s*product\s*manager|technical\s*product\s*manager)\b/i.test(haystack)) matchedTags.push('Product Manager');
+      if (/\b(product\s*owner)\b/i.test(haystack)) matchedTags.push('Product Owner');
+      if (/\b(vp\s*(of\s*)?product|head\s*of\s*product)\b/i.test(haystack)) matchedTags.push('VP Product');
+      if (/\b(automotive|vehicle|connected\s*car|autonomous|mobility)\b/i.test(haystack)) matchedTags.push('Automotive');
+      if (/\b(cyber\s*security|cybersecurity|security)\b/i.test(haystack)) matchedTags.push('Cybersecurity');
+      if (AUTOMOTIVE_CYBER_VARIANTS.CSMS.some((v) => haystack.includes(v))) matchedTags.push('CSMS');
+      if (AUTOMOTIVE_CYBER_VARIANTS.R155.some((v) => haystack.includes(v))) matchedTags.push('R155');
+      if (AUTOMOTIVE_CYBER_VARIANTS.VSOC.some((v) => haystack.includes(v))) matchedTags.push('VSOC');
+      if (AUTOMOTIVE_CYBER_VARIANTS.IDPS.some((v) => haystack.includes(v))) matchedTags.push('IDPS');
+      if (AUTOMOTIVE_CYBER_VARIANTS['21434'].some((v) => haystack.includes(v))) matchedTags.push('21434');
+      if (hasVisaOrRelocation) matchedTags.push('Visa / Relocation');
+
+      // 基础相关性打分（优先突出 PM/PO/VP + 汽车网安 CSMS/R155/VSOC/IDPS/21434 + 签证支持）
+      let score = 0;
+      if (hasRoleMatch) score += 35;
+      if (hasAutomotiveCyberMatch) score += 35;
+      if (/\b(automotive|vehicle|iso\s*\/?\s*sae\s*21434|21434|un\s*r155|unece\s*r155|r155|csms|vsoc|vehicle\s*soc|idps|intrusion\s*detection|intrusion\s*prevention)\b/i.test(haystack)) score += 20;
+      if (matchedTags.some((t) => ['CSMS', 'R155', 'VSOC', 'IDPS', '21434'].includes(t))) score += 15;
+      if (hasVisaOrRelocation) score += 20;
+      if (['United States', 'Germany', 'Netherlands', 'Ireland', 'United Kingdom', 'Canada', 'Sweden', 'France', 'Spain', 'Poland', 'New Zealand'].includes(country)) {
+        score += 10;
+      }
+
+      const isStrictMatch = (hasRoleMatch || hasAutomotiveCyberMatch) && hasVisaOrRelocation;
+      const isBroadMatch = hasRoleMatch || hasAutomotiveCyberMatch || hasVisaOrRelocation;
+
+      return {
+        id: rawJob.id || hashString(`${source}|${company}|${title}|${url}`),
+        title,
+        company,
+        location,
+        country,
+        source,
+        url,
+        visaBadge: inferVisaBadge(country, hasVisaOrRelocation, source),
+        workMode,
+        workModeLabel,
+        salary,
+        applicants,
+        publishedAtMs,
+        publishedLabel,
+        plainSummary,
+        responsibilities,
+        sanitizedHtml: sanitizeHtml(htmlDesc) || `<p>${escapeHtml(plainSummary)}</p>`,
+        matchedTags: matchedTags.slice(0, 6),
+        score,
+        baseScore: score,
+        isStrictMatch,
+        isBroadMatch
+      };
+    }
+<!-- ... existing code ... -->
+      // 汽车网络安全 CSMS / R155 / VSOC / IDPS / 21434 + 产品管理核心先验加分
+      if (haystack.includes('automotive') || haystack.includes('vehicle') || haystack.includes('iso 21434') || haystack.includes('21434')) {
+        positiveBoost += 12;
+      }
+      if (haystack.includes('cybersecurity') || haystack.includes('cyber security') || haystack.includes('security')) {
+        positiveBoost += 12;
+      }
+      if (AUTOMOTIVE_CYBER_VARIANTS.CSMS.some((v) => haystack.includes(v))) positiveBoost += 14;
+      if (AUTOMOTIVE_CYBER_VARIANTS.R155.some((v) => haystack.includes(v))) positiveBoost += 14;
+      if (AUTOMOTIVE_CYBER_VARIANTS.VSOC.some((v) => haystack.includes(v))) positiveBoost += 14;
+      if (AUTOMOTIVE_CYBER_VARIANTS.IDPS.some((v) => haystack.includes(v))) positiveBoost += 14;
+      if (AUTOMOTIVE_CYBER_VARIANTS['21434'].some((v) => haystack.includes(v))) positiveBoost += 14;
+<!-- ... existing code ... -->
+    /**
+     * 根据自学习负样本与汽车网安核心术语生成自适应检索建议与更新求职站检索链接
+     */
+    function buildAdaptiveSearchQuery() {
+      const topNeg = Object.entries(state.learningModel.negativeTokens || {})
+        .filter(([tok]) => !CORE_POSITIVE_TERMS.some((pos) => tok.includes(pos) || pos.includes(tok)))
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([tok]) => tok);
+
+      const boostedCyberTerms = Object.entries(state.learningModel.positiveTokens || {})
+        .filter(([tok, w]) => Number(w) > 0 && ['csms', 'r155', 'vsoc', 'idps', '21434'].includes(tok.toLowerCase()))
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 2)
+        .map(([tok]) => tok.toUpperCase());
+
+      const baseFocus =
+        boostedCyberTerms.length > 0
+          ? `Product Manager Automotive Cybersecurity (${boostedCyberTerms.join(' OR ')})`
+          : 'Product Manager Automotive Cybersecurity (CSMS OR R155 OR VSOC OR IDPS OR 21434)';
+
+      if (topNeg.length === 0) {
+        return `${baseFocus} Visa -intern -junior`;
+      }
+      const exclusions = topNeg.map((t) => `-${t.includes(' ') ? `"${t}"` : t}`).join(' ');
+      return `${baseFocus} ${exclusions}`;
+    }
+
+    function updateLearningBannerAndLinks() {
+      const negCount = state.irrelevantIds.size;
+      const negTokensCount = Object.keys(state.learningModel.negativeTokens || {}).length;
+      const adaptiveQuery = buildAdaptiveSearchQuery();
+
+      const pillEl = document.getElementById('learning-pill-count');
+      if (pillEl) pillEl.textContent = `${negCount}负样本 · ${negTokensCount}权重`;
+
+      const hiddenCountEl = document.getElementById('irrelevant-hidden-count');
+      if (hiddenCountEl) hiddenCountEl.textContent = String(negCount);
+
+      const toggleIrrBtn = document.getElementById('btn-toggle-show-irrelevant');
+      if (toggleIrrBtn) {
+        toggleIrrBtn.textContent = state.showIrrelevant
+          ? `隐藏已标记「不相关」 (${negCount})`
+          : `查看已标记「不相关」 (${negCount})`;
+      }
+
+      const summaryEl = document.getElementById('learning-summary-text');
+      if (summaryEl) {
+        summaryEl.innerHTML =
+          `已累计 <strong>${negCount}</strong> 条「不相关」负反馈与 <strong>${negTokensCount}</strong> 项负特征权重（已融入 CSMS / R155 / VSOC / IDPS / 21434 推荐加权）；` +
+          `自适应推荐检索词：<code class="rounded bg-white px-1.5 py-0.5 font-mono text-[11px] text-emerald-800 border border-emerald-200">${escapeHtml(adaptiveQuery)}</code>`;
+      }
+
+      // 动态更新外部招聘站直达链接的查询参数（保留 CSMS / R155 / VSOC / IDPS / 21434 精准检索）
+      const encodedAdaptive = encodeURIComponent(adaptiveQuery);
+      const liUs = document.getElementById('launcher-linkedin-us');
+      if (liUs) {
+        liUs.href = `https://www.linkedin.com/jobs/search/?keywords=${encodedAdaptive}&location=United%20States&f_TPR=r604800`;
+      }
+      const inUs = document.getElementById('launcher-indeed-us');
+      if (inUs) {
+        inUs.href = `https://www.indeed.com/jobs?q=${encodedAdaptive}&fromage=7`;
+      }
+      const liDe = document.getElementById('launcher-linkedin-de');
+      if (liDe) {
+        liDe.href = `https://www.linkedin.com/jobs/search/?keywords=${encodedAdaptive}&location=Germany&f_TPR=r604800`;
+      }
+      const jobbankCa = document.getElementById('launcher-jobbank-ca');
+      if (jobbankCa) {
+        jobbankCa.href = `https://www.jobbank.gc.ca/jobsearch/jobsearch?searchstring=${encodeURIComponent('Product Manager Cybersecurity Automotive CSMS R155 VSOC IDPS 21434')}&fsrc=32`;
+      }
+    }
+<!-- ... existing code ... -->
+        if (state.filters.keyword !== 'ALL') {
+          const kw = state.filters.keyword;
+          const kwLower = kw.toLowerCase();
+          const variantList = AUTOMOTIVE_CYBER_VARIANTS[kw] || [kwLower];
+          const textBlob = `${job.title} ${job.company} ${job.location} ${job.plainSummary} ${job.matchedTags.join(' ')}`.toLowerCase();
+          const matchesKw = variantList.some((v) => textBlob.includes(v.toLowerCase())) || job.matchedTags.includes(kw);
+          if (!matchesKw) return false;
+        }
+
+        if (searchQ) {
+          const searchVariants = AUTOMOTIVE_CYBER_VARIANTS[searchQ.toUpperCase()] || [searchQ];
+          const blob = `${job.title} ${job.company} ${job.location} ${job.country} ${job.salary} ${job.plainSummary} ${job.responsibilities.join(' ')} ${job.matchedTags.join(' ')}`.toLowerCase();
+          const hitsSearch = searchVariants.some((v) => blob.includes(v.toLowerCase()));
+          if (!hitsSearch) return false;
+        }
+
+        return true;
+      });
+    }
+<!-- ... existing code ... -->
+      const adaptiveQuery = buildAdaptiveSearchQuery();
+      const historyList = state.learningModel.history || [];
+
+      document.getElementById('learning-panel-body').innerHTML = `
+        <div class="rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 space-y-2">
+          <div class="font-bold text-sm text-emerald-950">1. 自适应检索词与排序校准策略（含 CSMS / R155 / VSOC / IDPS / 21434 加权）</div>
+          <p class="text-slate-600 leading-relaxed">
+            当您点击卡片右上角的「不相关」时，引擎会自动抽取岗位标题、职责与企业/国家/模式维度特征，累积负权重并实时重排看板；同时对 <strong>CSMS、R155、VSOC、IDPS、21434</strong> 及标准变体（ISO/SAE 21434、UN R155、Vehicle SOC、Intrusion Detection/Prevention）给予推荐加权，并排除高惩罚噪声词根生成自适应检索式：
+          </p>
+          <div class="rounded-lg border border-emerald-200 bg-white px-3 py-2 font-mono text-xs text-slate-900">
+            ${escapeHtml(adaptiveQuery)}
+          </div>
+        </div>
+<!-- ... existing code ... -->
