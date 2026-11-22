@@ -112,9 +112,27 @@
       margin-bottom: 16px;
     }
 
+    .toast-banner {
+      display: none;
+      padding: 10px 16px;
+      margin-bottom: 14px;
+      border-radius: 10px;
+      background: rgba(56, 189, 248, 0.14);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #bae6fd;
+      font-size: 13px;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toast-banner.show {
+      display: flex;
+    }
+
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -140,6 +158,10 @@
 
     .stat-value.good {
       color: #4ade80;
+    }
+
+    .stat-value.warn {
+      color: #fbbf24;
     }
 
     .filters-panel {
@@ -333,6 +355,12 @@
       color: #c7d2fe;
     }
 
+    .tag.auto-filtered {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.45);
+      color: #fcd34d;
+    }
+
     .feedback-note-banner {
       padding: 7px 10px;
       border-radius: 8px;
@@ -520,6 +548,11 @@
       <div id="refreshTimerText">自动刷新周期：每 3 小时</div>
     </div>
 
+    <div class="toast-banner" id="feedbackToastBanner">
+      <span id="feedbackToastText"></span>
+      <button id="closeToastBtn" style="padding: 4px 9px; font-size: 12px;">知道了</button>
+    </div>
+
     <section class="stats-grid">
       <div class="stat-card">
         <div class="stat-label">当前展示岗位</div>
@@ -534,8 +567,8 @@
         <div class="stat-value good" id="statInterested">0</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">已标记「不相关」</div>
-        <div class="stat-value" id="statIrrelevant">0</div>
+        <div class="stat-label">已排除（含负向联动过滤）</div>
+        <div class="stat-value warn" id="statIrrelevant">0</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">已跳转原帖</div>
@@ -573,7 +606,7 @@
         </label>
         <label style="font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
           <input id="showIrrelevantCheckbox" type="checkbox" />
-          显示「不相关」岗位
+          显示已排除/相似过滤岗位
         </label>
       </div>
 
@@ -602,11 +635,11 @@
       <div class="quick-reason-chips" id="quickReasonChips"></div>
       <div class="form-group">
         <label for="feedbackReasonTextarea">补充说明（非必填）</label>
-        <textarea id="feedbackReasonTextarea" rows="3" placeholder="例如：需要德语流利、不提供签证担保、或 CSMS/R155 产品负责人契合度极高..."></textarea>
+        <textarea id="feedbackReasonTextarea" rows="3" placeholder="例如：需要德语流利、不提供签证担保、偏纯研发岗，或 CSMS/R155 产品负责人契合度极高..."></textarea>
       </div>
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
         <button id="skipFeedbackBtn">跳过，直接提交</button>
-        <button id="confirmFeedbackBtn" class="primary">提交反馈并更新策略</button>
+        <button id="confirmFeedbackBtn" class="primary">提交反馈并全局更新面板</button>
       </div>
     </div>
   </div>
@@ -639,7 +672,7 @@
         <button id="closeLearningBtn">关闭</button>
       </div>
       <p style="font-size: 13px; color: var(--muted); margin-top: 0;">
-        点击<strong>「感兴趣」</strong>会提升对应岗位特征、公司、地区与输入理由关键词的权重；点击<strong>「不相关」</strong>会降低对应特征权重并优化检索词。
+        提交<strong>「不相关」</strong>后，系统会立即提取负向特征并<strong>自动过滤当前列表中同类型的相似岗位</strong>；提交<strong>「感兴趣」</strong>会实时拉升同类高匹配岗位排序。
       </p>
       <div class="form-group">
         <label>自适应检索词扩展预览</label>
@@ -658,7 +691,7 @@
         <div id="feedbackLogsList" class="log-list"></div>
       </div>
       <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 16px;">
-        <button id="resetLearningBtn" style="border-color: rgba(239, 68, 68, 0.5); color: #fca5a5;">重置所有学习权重与反馈记录</button>
+        <button id="resetLearningBtn" style="border-color: rgba(239, 68, 68, 0.5); color: #fca5a5;">重置所有学习权重与排除记录</button>
         <button id="saveLearningCloseBtn" class="primary">完成</button>
       </div>
     </div>
@@ -691,14 +724,15 @@
 
   <script>
     const STORAGE_KEYS = {
-      IRRELEVANT_IDS: 'acvj_irrelevant_ids_v2',
-      INTERESTED_IDS: 'acvj_interested_ids_v2',
-      VISITED_IDS: 'acvj_visited_ids_v2',
-      FEEDBACK_NOTES: 'acvj_feedback_notes_v2',
-      FEEDBACK_LOGS: 'acvj_feedback_logs_v2',
-      LEARNING_STATE: 'acvj_learning_state_v2',
-      SETTINGS: 'acvj_settings_v2',
-      CACHED_JOBS: 'acvj_cached_jobs_v2'
+      IRRELEVANT_IDS: 'acvj_irrelevant_ids_v3',
+      INTERESTED_IDS: 'acvj_interested_ids_v3',
+      VISITED_IDS: 'acvj_visited_ids_v3',
+      FEEDBACK_NOTES: 'acvj_feedback_notes_v3',
+      FEEDBACK_LOGS: 'acvj_feedback_logs_v3',
+      NEGATIVE_RULES: 'acvj_negative_rules_v3',
+      LEARNING_STATE: 'acvj_learning_state_v3',
+      SETTINGS: 'acvj_settings_v3',
+      CACHED_JOBS: 'acvj_cached_jobs_v3'
     };
 
     const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
@@ -825,6 +859,12 @@
       'sponsorship available'
     ];
 
+    const PROTECT_CORE_TOKENS = new Set([
+      'product', 'manager', 'owner', 'vp', 'head', 'director',
+      'automotive', 'vehicle', 'cybersecurity', 'cyber', 'security',
+      'csms', 'r155', 'vsoc', 'idps', '21434', 'iso', 'visa', 'relocation'
+    ]);
+
     const DEFAULT_GREENHOUSE_BOARDS = ['rivian', 'polestar', 'mobileye', 'aurora', 'appliedintuition'];
 
     function normalizeSearchText(input) {
@@ -858,9 +898,83 @@
     }
 
     /**
+     * 检查单条岗位是否命中由负向反馈生成的自动过滤规则
+     */
+    function checkAutoFilteredByNegativeRules(job, negativeRules = [], learningState = {}, interestedIds = []) {
+      if (interestedIds.includes(job.id)) {
+        return { isAutoFiltered: false, matchedRuleReason: '' };
+      }
+
+      const titleNorm = normalizeSearchText(job.title || '');
+      const companyNorm = normalizeSearchText(job.company || '');
+      const fullNorm = normalizeSearchText(
+        `${job.title || ''} ${job.company || ''} ${job.location || ''} ${job.description || ''} ${job.responsibilities || ''}`
+      );
+
+      for (const rule of negativeRules) {
+        if (!rule) continue;
+
+        // 1. 命中明确排除的公司
+        if (rule.companyNorm && companyNorm && companyNorm === rule.companyNorm && rule.excludeCompany) {
+          return {
+            isAutoFiltered: true,
+            matchedRuleReason: `同公司负向关联（${job.company}）`
+          };
+        }
+
+        // 2. 命中明确的意图标注规则（如要求本地德语/法语、无签证担保、偏纯研发等）
+        if (Array.isArray(rule.intentPatterns) && rule.intentPatterns.length > 0) {
+          for (const pat of rule.intentPatterns) {
+            if (pat.type === 'no_visa' && /no visa|without visa|cannot sponsor|not sponsor|no sponsorship|citizenship required|us citizen only/.test(fullNorm)) {
+              return { isAutoFiltered: true, matchedRuleReason: '负向反馈规则：明确无签证/身份限制' };
+            }
+            if (pat.type === 'local_language' && /fluent german|german required|c1 german|c2 german|deutschkenntnisse|fließend deutsch|fluent french|french required|c1 french/.test(fullNorm)) {
+              return { isAutoFiltered: true, matchedRuleReason: '负向反馈规则：要求流利本地小语种' };
+            }
+            if (pat.type === 'non_pm' && !/(product manager|product owner|vp product|head of product|director of product)/.test(titleNorm)) {
+              if (/(software engineer|backend engineer|frontend engineer|devops|sales representative|account executive|recruiter|hr )/.test(titleNorm)) {
+                return { isAutoFiltered: true, matchedRuleReason: '负向反馈规则：非产品管理类岗位' };
+              }
+            }
+            if (pat.type === 'non_auto_cyber') {
+              const hasCoreDomain = /(automotive|vehicle|autonomous|mobility|cybersecurity|cyber security|csms|r155|vsoc|idps|21434)/.test(fullNorm);
+              if (!hasCoreDomain) {
+                return { isAutoFiltered: true, matchedRuleReason: '负向反馈规则：与汽车网安核心领域无关' };
+              }
+            }
+          }
+        }
+
+        // 3. 命中负向标题签名词重合度（至少 2 个非核心保护词重合，或高度相似标题）
+        if (Array.isArray(rule.titleTokens) && rule.titleTokens.length >= 2) {
+          const overlap = rule.titleTokens.filter(tok => includesTerm(titleNorm, tok));
+          if (overlap.length >= 2) {
+            return {
+              isAutoFiltered: true,
+              matchedRuleReason: `与已标「不相关」岗位高度相似（匹配词：${overlap.join(', ')}）`
+            };
+          }
+        }
+
+        // 4. 命中用户自定义输入的英文否定关键词
+        if (Array.isArray(rule.customNegativeKeywords) && rule.customNegativeKeywords.length > 0) {
+          const hitCustom = rule.customNegativeKeywords.find(kw => includesTerm(fullNorm, kw));
+          if (hitCustom) {
+            return {
+              isAutoFiltered: true,
+              matchedRuleReason: `命中负向反馈关键词「${hitCustom}」`
+            };
+          }
+        }
+      }
+
+      return { isAutoFiltered: false, matchedRuleReason: '' };
+    }
+
+    /**
      * 规范化并评估单条真实岗位的关键词匹配、签证支持与自学习推荐分
      */
-    function evaluateJobListing(job, learningState = {}, interestedIds = []) {
+    function evaluateJobListing(job, learningState = {}, interestedIds = [], negativeRules = []) {
       const title = String(job.title || '').trim();
       const company = String(job.company || '').trim();
       const location = String(job.location || '').trim();
@@ -927,7 +1041,12 @@
       }
 
       if (interestedIds.includes(job.id)) {
-        learningAdjustment += 8;
+        learningAdjustment += 10;
+      }
+
+      const autoFilterCheck = checkAutoFilteredByNegativeRules(job, negativeRules, learningState, interestedIds);
+      if (autoFilterCheck.isAutoFiltered) {
+        learningAdjustment -= 30;
       }
 
       const finalScore = Math.max(0, Math.min(100, Math.round(score + learningAdjustment)));
@@ -952,7 +1071,9 @@
         matchedKeywords,
         baseScore: Math.min(100, Math.round(score)),
         learningAdjustment: Math.round(learningAdjustment * 10) / 10,
-        recommendationScore: finalScore
+        recommendationScore: finalScore,
+        isAutoFiltered: autoFilterCheck.isAutoFiltered,
+        autoFilterReason: autoFilterCheck.matchedRuleReason
       };
     }
 
@@ -988,6 +1109,7 @@
       visitedIds: loadJsonStorage(STORAGE_KEYS.VISITED_IDS, []),
       feedbackNotes: loadJsonStorage(STORAGE_KEYS.FEEDBACK_NOTES, {}),
       feedbackLogs: loadJsonStorage(STORAGE_KEYS.FEEDBACK_LOGS, []),
+      negativeRules: loadJsonStorage(STORAGE_KEYS.NEGATIVE_RULES, []),
       learning: loadJsonStorage(STORAGE_KEYS.LEARNING_STATE, {
         positiveWeights: {},
         negativeWeights: {}
@@ -1036,15 +1158,11 @@
       return Array.from(new Set([...titleTokens.slice(0, 6), ...(job.matchedCyberPillars || []).map(s => s.toLowerCase()), companyKey, regionKey].filter(Boolean)));
     }
 
-    /**
-     * 解析用户填写的自由文字反馈，提取中英文关键概念用于强化或降权
-     */
     function extractReasonTokens(reasonText = '') {
       const raw = String(reasonText || '').trim();
       if (!raw) return [];
       const tokens = new Set();
 
-      // 提取英文/数字关键词（长度>=2）
       const enMatches = raw.toLowerCase().match(/[a-z0-9][a-z0-9\-\/]{1,24}/g) || [];
       enMatches.forEach(tok => {
         if (!['the', 'and', 'for', 'not', 'no', 'yes', 'with'].includes(tok)) {
@@ -1052,7 +1170,6 @@
         }
       });
 
-      // 常见中文反馈意图映射为可检索的英文核心词
       const zhMappings = [
         { pattern: /签证|工签|担保|蓝卡|移民|搬迁/, mapped: ['visa', 'relocation', 'blue card'] },
         { pattern: /德语|法语|本地语言|小语种/, mapped: ['german', 'french', 'fluent'] },
@@ -1068,20 +1185,66 @@
         }
       });
 
-      // 保留有意义的中文短语片段（2~8个汉字）
       const zhMatches = raw.match(/[\u4e00-\u9fa5]{2,8}/g) || [];
       zhMatches.slice(0, 4).forEach(z => tokens.add(z));
 
       return Array.from(tokens).slice(0, 10);
     }
 
+    /**
+     * 基于被标为「不相关」的岗位及其原因，构建结构化排除规则以即时过滤其他相似卡片
+     */
+    function buildNegativeRuleFromJob(job, cleanReason = '') {
+      const titleTokens = normalizeSearchText(job.title)
+        .split(' ')
+        .filter(w => w.length >= 3 && !PROTECT_CORE_TOKENS.has(w) && !['senior', 'lead', 'staff', 'principal', 'junior', 'intern', 'the', 'and', 'for', 'with'].includes(w));
+
+      const intentPatterns = [];
+      if (/无签证|不提供签证|担保|公民|身份/.test(cleanReason)) {
+        intentPatterns.push({ type: 'no_visa' });
+      }
+      if (/德语|法语|本地语言|小语种/.test(cleanReason)) {
+        intentPatterns.push({ type: 'local_language' });
+      }
+      if (/非产品|纯研发|纯技术|销售|市场/.test(cleanReason)) {
+        intentPatterns.push({ type: 'non_pm' });
+      }
+      if (/无关|汽车网安|csms|r155/i.test(cleanReason) && /无关|不符|不匹配/.test(cleanReason)) {
+        intentPatterns.push({ type: 'non_auto_cyber' });
+      }
+
+      const customNegativeKeywords = (cleanReason.toLowerCase().match(/[a-z0-9][a-z0-9\-\/]{2,24}/g) || [])
+        .filter(tok => !PROTECT_CORE_TOKENS.has(tok) && !['no', 'not', 'non', 'for', 'and', 'with'].includes(tok));
+
+      const excludeCompany = /公司|企业|黑名单|不考虑该厂/.test(cleanReason);
+
+      return {
+        sourceJobId: job.id,
+        companyNorm: normalizeSearchText(job.company || ''),
+        excludeCompany,
+        titleTokens: Array.from(new Set(titleTokens)).slice(0, 5),
+        intentPatterns,
+        customNegativeKeywords: Array.from(new Set(customNegativeKeywords)).slice(0, 5),
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    function showFeedbackToast(message) {
+      const banner = document.getElementById('feedbackToastBanner');
+      document.getElementById('feedbackToastText').textContent = message;
+      banner.classList.add('show');
+    }
+
     function handleFeedbackButtonClick(jobId, type) {
       if (type === 'irrelevant' && state.irrelevantIds.includes(jobId)) {
         state.irrelevantIds = state.irrelevantIds.filter(id => id !== jobId);
+        state.negativeRules = state.negativeRules.filter(r => r.sourceJobId !== jobId);
         delete state.feedbackNotes[jobId];
         saveJsonStorage(STORAGE_KEYS.IRRELEVANT_IDS, state.irrelevantIds);
+        saveJsonStorage(STORAGE_KEYS.NEGATIVE_RULES, state.negativeRules);
         saveJsonStorage(STORAGE_KEYS.FEEDBACK_NOTES, state.feedbackNotes);
         reScoreAndRender();
+        showFeedbackToast('已撤销「不相关」标记，并恢复关联的相似岗位展示。');
         if (state.activeDetailId === jobId && document.getElementById('detailModal').classList.contains('open')) {
           openDetailModal(jobId);
         }
@@ -1094,6 +1257,7 @@
         saveJsonStorage(STORAGE_KEYS.INTERESTED_IDS, state.interestedIds);
         saveJsonStorage(STORAGE_KEYS.FEEDBACK_NOTES, state.feedbackNotes);
         reScoreAndRender();
+        showFeedbackToast('已撤销「感兴趣」标记并重新计算推荐排序。');
         if (state.activeDetailId === jobId && document.getElementById('detailModal').classList.contains('open')) {
           openDetailModal(jobId);
         }
@@ -1114,8 +1278,8 @@
         : `标记「不相关」— 添加排除原因说明（选填）`;
 
       document.getElementById('feedbackModalDesc').textContent = isPos
-        ? `岗位：${job.title}（${job.company}）。可点选下方标签或输入补充原因（非必填），引擎将提高同类岗位推荐权重。`
-        : `岗位：${job.title}（${job.company}）。可点选下方标签或输入补充原因（非必填），引擎将降低同类岗位权重。`;
+        ? `岗位：${job.title}（${job.company}）。提交后将立即拉升当前列表中同类高匹配岗位的排序。`
+        : `岗位：${job.title}（${job.company}）。提交后将立即从当前列表中删减与该负向反馈相关的相似岗位。`;
 
       const presets = QUICK_FEEDBACK_PRESETS[type] || [];
       const chipsEl = document.getElementById('quickReasonChips');
@@ -1148,19 +1312,21 @@
 
       if (!job) return;
 
+      const beforeVisibleCount = getFilteredJobs().length;
       const baseFeatures = extractFeaturesForLearning(job);
       const reasonTokens = extractReasonTokens(cleanReason);
 
       if (type === 'interested') {
         state.irrelevantIds = state.irrelevantIds.filter(id => id !== jobId);
+        state.negativeRules = state.negativeRules.filter(r => r.sourceJobId !== jobId);
         if (!state.interestedIds.includes(jobId)) {
           state.interestedIds.push(jobId);
         }
         baseFeatures.forEach(feat => {
-          state.learning.positiveWeights[feat] = Math.min(25, (state.learning.positiveWeights[feat] || 0) + 2.5);
+          state.learning.positiveWeights[feat] = Math.min(25, (state.learning.positiveWeights[feat] || 0) + 3.0);
         });
         reasonTokens.forEach(tok => {
-          state.learning.positiveWeights[tok] = Math.min(25, (state.learning.positiveWeights[tok] || 0) + 3.5);
+          state.learning.positiveWeights[tok] = Math.min(25, (state.learning.positiveWeights[tok] || 0) + 4.0);
         });
       } else {
         state.interestedIds = state.interestedIds.filter(id => id !== jobId);
@@ -1168,11 +1334,15 @@
           state.irrelevantIds.push(jobId);
         }
         baseFeatures.forEach(feat => {
-          state.learning.negativeWeights[feat] = Math.min(25, (state.learning.negativeWeights[feat] || 0) + 2.5);
+          state.learning.negativeWeights[feat] = Math.min(25, (state.learning.negativeWeights[feat] || 0) + 3.0);
         });
         reasonTokens.forEach(tok => {
-          state.learning.negativeWeights[tok] = Math.min(25, (state.learning.negativeWeights[tok] || 0) + 3.5);
+          state.learning.negativeWeights[tok] = Math.min(25, (state.learning.negativeWeights[tok] || 0) + 4.0);
         });
+
+        // 生成并保存联动负向过滤规则
+        state.negativeRules = state.negativeRules.filter(r => r.sourceJobId !== jobId);
+        state.negativeRules.unshift(buildNegativeRuleFromJob(job, cleanReason));
       }
 
       if (cleanReason) {
@@ -1196,11 +1366,31 @@
       saveJsonStorage(STORAGE_KEYS.INTERESTED_IDS, state.interestedIds);
       saveJsonStorage(STORAGE_KEYS.FEEDBACK_NOTES, state.feedbackNotes);
       saveJsonStorage(STORAGE_KEYS.FEEDBACK_LOGS, state.feedbackLogs);
+      saveJsonStorage(STORAGE_KEYS.NEGATIVE_RULES, state.negativeRules);
       saveJsonStorage(STORAGE_KEYS.LEARNING_STATE, state.learning);
 
+      // 重新评估当前所有岗位并重绘列表
       reScoreAndRender();
+
+      const afterVisibleCount = getFilteredJobs().length;
+      if (type === 'irrelevant') {
+        const removedTotal = Math.max(1, beforeVisibleCount - afterVisibleCount);
+        const similarRemoved = Math.max(0, removedTotal - 1);
+        showFeedbackToast(
+          similarRemoved > 0
+            ? `已标记「${job.title}」为不相关，并联动从当前面板自动删减了 ${similarRemoved} 个负向相关岗位（共移除 ${removedTotal} 个）。`
+            : `已标记「${job.title}」为不相关并从当前面板移除，后续抓取将自动降权同类岗位。`
+        );
+      } else {
+        showFeedbackToast(`已标记「${job.title}」为感兴趣，当前面板已按最新正向偏好重新计算推荐分并置顶高契合岗位。`);
+      }
+
       if (state.activeDetailId === jobId && document.getElementById('detailModal').classList.contains('open')) {
-        openDetailModal(jobId);
+        if (type === 'irrelevant' && !state.showIrrelevant) {
+          document.getElementById('detailModal').classList.remove('open');
+        } else {
+          openDetailModal(jobId);
+        }
       }
     }
 
@@ -1275,7 +1465,9 @@
     }
 
     function reScoreAndRender() {
-      state.jobs = state.jobs.map(job => evaluateJobListing(job, state.learning, state.interestedIds));
+      state.jobs = state.jobs.map(job =>
+        evaluateJobListing(job, state.learning, state.interestedIds, state.negativeRules)
+      );
       renderExternalBoards();
       renderJobs();
     }
@@ -1285,10 +1477,12 @@
       const selectedVariants = expandKeywordVariants(state.selectedKeyword);
 
       const list = state.jobs.filter(job => {
-        const isIrrelevant = state.irrelevantIds.includes(job.id);
+        const isManualIrrelevant = state.irrelevantIds.includes(job.id);
+        const isAutoFiltered = Boolean(job.isAutoFiltered);
+        const isExcluded = isManualIrrelevant || isAutoFiltered;
         const isInterested = state.interestedIds.includes(job.id);
 
-        if (isIrrelevant && !state.showIrrelevant) return false;
+        if (isExcluded && !state.showIrrelevant) return false;
         if (state.interestedOnly && !isInterested) return false;
         if (state.visaOnly && !job.hasVisaSupport) return false;
         if (state.region !== 'ALL' && detectRegion(job.location) !== state.region) return false;
@@ -1323,20 +1517,26 @@
       const filtered = getFilteredJobs();
       const grid = document.getElementById('jobsGrid');
 
+      const totalExcludedCount = state.jobs.filter(
+        j => state.irrelevantIds.includes(j.id) || j.isAutoFiltered
+      ).length;
+
       document.getElementById('statShown').textContent = String(filtered.length);
       document.getElementById('statTotal').textContent = String(state.jobs.length);
       document.getElementById('statInterested').textContent = String(state.interestedIds.length);
-      document.getElementById('statIrrelevant').textContent = String(state.irrelevantIds.length);
+      document.getElementById('statIrrelevant').textContent = String(totalExcludedCount);
       document.getElementById('statVisited').textContent = String(state.visitedIds.length);
 
       if (!filtered.length) {
-        grid.innerHTML = `<div class="empty-state">当前筛选条件下暂无匹配岗位。可尝试切换快捷关键词、取消「仅看签证/搬迁线索」或点击「立即刷新岗位」。</div>`;
+        grid.innerHTML = `<div class="empty-state">当前筛选条件下暂无匹配岗位。可尝试切换快捷关键词、取消「仅看签证/搬迁线索」或勾选「显示已排除/相似过滤岗位」。</div>`;
         return;
       }
 
       grid.innerHTML = filtered
         .map(job => {
-          const isIrrelevant = state.irrelevantIds.includes(job.id);
+          const isManualIrrelevant = state.irrelevantIds.includes(job.id);
+          const isAutoFiltered = Boolean(job.isAutoFiltered);
+          const isExcluded = isManualIrrelevant || isAutoFiltered;
           const isInterested = state.interestedIds.includes(job.id);
           const isVisited = state.visitedIds.includes(job.id);
           const noteObj = state.feedbackNotes[job.id];
@@ -1349,10 +1549,12 @@
             ? `<div class="feedback-note-banner ${noteObj.type === 'interested' ? 'pos' : 'neg'}">
                  <strong>${noteObj.type === 'interested' ? '正向备注' : '排除原因'}：</strong>${escapeHtml(noteObj.reason)}
                </div>`
-            : '';
+            : (isAutoFiltered && job.autoFilterReason
+                ? `<div class="feedback-note-banner neg"><strong>联动过滤：</strong>${escapeHtml(job.autoFilterReason)}</div>`
+                : '');
 
           return `
-            <article class="job-card ${isIrrelevant ? 'irrelevant' : ''} ${isInterested ? 'interested' : ''}">
+            <article class="job-card ${isExcluded ? 'irrelevant' : ''} ${isInterested ? 'interested' : ''}">
               <div>
                 <div class="card-top">
                   <div>
@@ -1363,8 +1565,8 @@
                     <button class="interested-btn ${isInterested ? 'active' : ''}" data-interested-id="${escapeAttr(job.id)}">
                       ${isInterested ? '✓ 感兴趣' : '感兴趣'}
                     </button>
-                    <button class="irrelevant-btn ${isIrrelevant ? 'active' : ''}" data-irrelevant-id="${escapeAttr(job.id)}">
-                      ${isIrrelevant ? '已标不相关' : '不相关'}
+                    <button class="irrelevant-btn ${isManualIrrelevant ? 'active' : ''}" data-irrelevant-id="${escapeAttr(job.id)}">
+                      ${isManualIrrelevant ? '已标不相关' : '不相关'}
                     </button>
                   </div>
                 </div>
@@ -1374,6 +1576,7 @@
                   <span class="tag">${escapeHtml(job.location || '未注明地点')}</span>
                   <span class="tag">${escapeHtml(mode)}</span>
                   ${job.hasVisaSupport ? '<span class="tag visa">签证/搬迁线索</span>' : ''}
+                  ${isAutoFiltered && !isManualIrrelevant ? '<span class="tag auto-filtered">同类负向过滤</span>' : ''}
                   ${cyberTags}
                 </div>
 
@@ -1434,7 +1637,9 @@
         ? `<div class="feedback-note-banner ${noteObj.type === 'interested' ? 'pos' : 'neg'}" style="margin-bottom:12px;">
              <strong>${noteObj.type === 'interested' ? '正向备注' : '排除原因'}：</strong>${escapeHtml(noteObj.reason)}
            </div>`
-        : '';
+        : (job.isAutoFiltered && job.autoFilterReason
+            ? `<div class="feedback-note-banner neg" style="margin-bottom:12px;"><strong>联动过滤：</strong>${escapeHtml(job.autoFilterReason)}</div>`
+            : '');
 
       document.getElementById('detailBody').textContent = stripHtml(job.description || job.responsibilities || '暂无完整描述。');
       const linkEl = document.getElementById('detailOriginalLink');
@@ -1596,7 +1801,9 @@
     async function refreshAllJobs(forceNetwork = true) {
       const cached = loadJsonStorage(STORAGE_KEYS.CACHED_JOBS, null);
       if (!forceNetwork && cached && cached.jobs?.length && (Date.now() - cached.timestamp) < THREE_HOURS_MS) {
-        state.jobs = cached.jobs.map(j => evaluateJobListing(j, state.learning, state.interestedIds));
+        state.jobs = cached.jobs.map(j =>
+          evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules)
+        );
         document.getElementById('sourceStatusText').textContent = `已加载 3 小时内缓存（${state.jobs.length} 条）· 更新于 ${new Date(cached.timestamp).toLocaleTimeString()}`;
         renderJobs();
         return;
@@ -1628,10 +1835,14 @@
 
       if (merged.length > 0) {
         saveJsonStorage(STORAGE_KEYS.CACHED_JOBS, { timestamp: Date.now(), jobs: merged });
-        state.jobs = merged.map(j => evaluateJobListing(j, state.learning, state.interestedIds));
+        state.jobs = merged.map(j =>
+          evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules)
+        );
         document.getElementById('sourceStatusText').textContent = `已同步 ${state.jobs.length} 条去重岗位 · 更新于 ${new Date().toLocaleTimeString()}`;
       } else if (cached?.jobs?.length) {
-        state.jobs = cached.jobs.map(j => evaluateJobListing(j, state.learning, state.interestedIds));
+        state.jobs = cached.jobs.map(j =>
+          evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules)
+        );
         document.getElementById('sourceStatusText').textContent = `外部接口暂无返回，已回退至本地缓存（${state.jobs.length} 条）`;
       } else {
         state.jobs = [];
@@ -1655,6 +1866,10 @@
 
     function bindEvents() {
       document.getElementById('refreshBtn').addEventListener('click', () => refreshAllJobs(true));
+
+      document.getElementById('closeToastBtn').addEventListener('click', () => {
+        document.getElementById('feedbackToastBanner').classList.remove('show');
+      });
 
       document.getElementById('searchInput').addEventListener('input', e => {
         state.searchQuery = e.target.value;
@@ -1723,15 +1938,18 @@
         state.visitedIds = [];
         state.feedbackNotes = {};
         state.feedbackLogs = [];
+        state.negativeRules = [];
         state.learning = { positiveWeights: {}, negativeWeights: {} };
         saveJsonStorage(STORAGE_KEYS.IRRELEVANT_IDS, []);
         saveJsonStorage(STORAGE_KEYS.INTERESTED_IDS, []);
         saveJsonStorage(STORAGE_KEYS.VISITED_IDS, []);
         saveJsonStorage(STORAGE_KEYS.FEEDBACK_NOTES, {});
         saveJsonStorage(STORAGE_KEYS.FEEDBACK_LOGS, []);
+        saveJsonStorage(STORAGE_KEYS.NEGATIVE_RULES, []);
         saveJsonStorage(STORAGE_KEYS.LEARNING_STATE, state.learning);
         reScoreAndRender();
         openLearningModal();
+        showFeedbackToast('已重置所有自学习权重与负向排除规则，所有岗位已恢复展示。');
       });
 
       document.getElementById('settingsBtn').addEventListener('click', () => {
