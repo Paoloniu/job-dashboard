@@ -80,9 +80,14 @@
       transition: all 0.16s ease;
     }
 
-    button:hover {
+    button:hover:not(:disabled) {
       border-color: var(--accent);
       transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     button.primary {
@@ -617,10 +622,10 @@
         <p class="subtitle">全球签证/搬迁支持岗位实时聚合 · 关注公司主动找官网 &amp; Open Positions · Product Manager / PO / VP Product · CSMS / R155 / VSOC / IDPS / 21434</p>
       </div>
       <div class="header-actions">
-        <button id="refreshBtn" class="primary">立即刷新岗位</button>
-        <button id="syncFollowedBtn">同步关注公司官网</button>
-        <button id="learningBtn">自学习推荐引擎</button>
-        <button id="settingsBtn">数据源配置</button>
+        <button id="refreshBtn" class="primary" type="button">立即刷新岗位</button>
+        <button id="syncFollowedBtn" type="button">同步关注公司官网</button>
+        <button id="learningBtn" type="button">自学习推荐引擎</button>
+        <button id="settingsBtn" type="button">数据源配置</button>
       </div>
     </header>
 
@@ -631,7 +636,7 @@
 
     <div class="toast-banner" id="feedbackToastBanner">
       <span id="feedbackToastText"></span>
-      <button id="closeToastBtn" style="padding: 4px 9px; font-size: 12px;">知道了</button>
+      <button id="closeToastBtn" type="button" style="padding: 4px 9px; font-size: 12px;">知道了</button>
     </div>
 
     <section class="stats-grid">
@@ -713,12 +718,12 @@
     </main>
   </div>
 
-  <!-- 双向反馈输入弹窗（非必填，支持快捷理由 + 自由文本） -->
+  <!-- 双向反馈输入弹窗 -->
   <div class="modal-backdrop" id="feedbackInputModal">
     <div class="modal small">
       <div class="modal-header">
         <h2 id="feedbackModalTitle">添加反馈说明（选填）</h2>
-        <button id="closeFeedbackInputBtn">取消</button>
+        <button id="closeFeedbackInputBtn" type="button">取消</button>
       </div>
       <p id="feedbackModalDesc" style="font-size: 13px; color: var(--muted); margin-top: 0;">
         输入具体原因可帮助推荐引擎更精准调整后续检索词与排序权重；也可以直接跳过。
@@ -729,31 +734,31 @@
         <textarea id="feedbackReasonTextarea" rows="3" placeholder="例如：需要德语流利、不提供签证担保、偏纯研发岗，或 CSMS/R155 产品负责人契合度极高..."></textarea>
       </div>
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
-        <button id="skipFeedbackBtn">跳过，直接提交</button>
-        <button id="confirmFeedbackBtn" class="primary">提交反馈并全局更新面板</button>
+        <button id="skipFeedbackBtn" type="button">跳过，直接提交</button>
+        <button id="confirmFeedbackBtn" class="primary" type="button">提交反馈并全局更新面板</button>
       </div>
     </div>
   </div>
 
-  <!-- 岗位详情抽屉/弹窗 -->
+  <!-- 岗位详情弹窗 -->
   <div class="modal-backdrop" id="detailModal">
     <div class="modal">
       <div class="modal-header">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <h2 id="detailTitle">岗位详情</h2>
-          <button id="detailFollowBtn" class="follow-btn">关注公司</button>
+          <button id="detailFollowBtn" class="follow-btn" type="button">关注公司</button>
         </div>
-        <button id="closeDetailBtn">关闭</button>
+        <button id="closeDetailBtn" type="button">关闭</button>
       </div>
       <div id="detailMeta" class="meta-tags" style="margin-bottom: 12px;"></div>
       <div id="detailWebsiteLinks" style="margin-bottom: 12px; font-size: 12.5px; display: flex; flex-wrap: wrap; gap: 12px;"></div>
       <div id="detailFeedbackBanner"></div>
       <div id="detailBody" style="font-size: 13.5px; line-height: 1.65; color: #dbeafe; white-space: pre-wrap;"></div>
       <div style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end;">
-        <button id="detailInterestedBtn" class="interested-btn">感兴趣</button>
-        <button id="detailIrrelevantBtn" class="irrelevant-btn">不相关</button>
+        <button id="detailInterestedBtn" class="interested-btn" type="button">感兴趣</button>
+        <button id="detailIrrelevantBtn" class="irrelevant-btn" type="button">不相关</button>
         <a id="detailOriginalLink" href="#" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
-          <button class="primary">打开原始招聘链接</button>
+          <button class="primary" type="button">打开原始招聘链接</button>
         </a>
       </div>
     </div>
@@ -764,7 +769,7 @@
     <div class="modal">
       <div class="modal-header">
         <h2>自学习推荐引擎（基于双向点击与文字反馈）</h2>
-        <button id="closeLearningBtn">关闭</button>
+        <button id="closeLearningBtn" type="button">关闭</button>
       </div>
       <p style="font-size: 13px; color: var(--muted); margin-top: 0;">
         提交<strong>「不相关」</strong>后，系统会立即提取负向特征并<strong>自动过滤当前列表中同类型的相似岗位</strong>；提交<strong>「感兴趣」</strong>或<strong>「关注」公司</strong>会主动定位官网并抓取 Open Positions / Vacancies 进行匹配计算。
@@ -786,8 +791,8 @@
         <div id="feedbackLogsList" class="log-list"></div>
       </div>
       <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 16px;">
-        <button id="resetLearningBtn" style="border-color: rgba(239, 68, 68, 0.5); color: #fca5a5;">重置所有学习权重与排除记录</button>
-        <button id="saveLearningCloseBtn" class="primary">完成</button>
+        <button id="resetLearningBtn" type="button" style="border-color: rgba(239, 68, 68, 0.5); color: #fca5a5;">重置所有学习权重与排除记录</button>
+        <button id="saveLearningCloseBtn" class="primary" type="button">完成</button>
       </div>
     </div>
   </div>
@@ -797,10 +802,10 @@
     <div class="modal">
       <div class="modal-header">
         <h2>数据源配置 &amp; 企业官网直连</h2>
-        <button id="closeSettingsBtn">关闭</button>
+        <button id="closeSettingsBtn" type="button">关闭</button>
       </div>
       <div class="form-group">
-        <label>GitHub Actions / 外部 JSON Feed URL（每行一个，如 https://raw.githubusercontent.com/用户名/job-dashboard/main/jobs.json）</label>
+        <label>GitHub Actions / 外部 JSON Feed URL（每行一个）</label>
         <textarea id="customJsonFeedsInput" rows="3" placeholder="https://raw.githubusercontent.com/your-username/job-dashboard/main/jobs.json"></textarea>
       </div>
       <div class="form-group">
@@ -812,30 +817,31 @@
         <textarea id="customCompanySlugsInput" rows="3" placeholder="Bosch=https://www.bosch.com/careers/&#10;Upstream Security=greenhouse:upstreamsecurity"></textarea>
       </div>
       <div class="form-group">
-        <label>JSearch (RapidAPI) Key（可选，用于聚合 LinkedIn / Indeed 等多源结果）</label>
+        <label>JSearch (RapidAPI) Key（可选）</label>
         <input id="jsearchKeyInput" type="password" placeholder="可选填入 RapidAPI Key" />
       </div>
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
-        <button id="saveSettingsBtn" class="primary">保存并重新拉取</button>
+        <button id="saveSettingsBtn" class="primary" type="button">保存并重新拉取</button>
       </div>
     </div>
   </div>
 
   <script>
     const STORAGE_KEYS = {
-      IRRELEVANT_IDS: 'acvj_irrelevant_ids_v5',
-      INTERESTED_IDS: 'acvj_interested_ids_v5',
-      FOLLOWED_COMPANIES: 'acvj_followed_companies_v5',
-      VISITED_IDS: 'acvj_visited_ids_v5',
-      FEEDBACK_NOTES: 'acvj_feedback_notes_v5',
-      FEEDBACK_LOGS: 'acvj_feedback_logs_v5',
-      NEGATIVE_RULES: 'acvj_negative_rules_v5',
-      LEARNING_STATE: 'acvj_learning_state_v5',
-      SETTINGS: 'acvj_settings_v5',
-      CACHED_JOBS: 'acvj_cached_jobs_v5'
+      IRRELEVANT_IDS: 'acvj_irrelevant_ids_v6',
+      INTERESTED_IDS: 'acvj_interested_ids_v6',
+      FOLLOWED_COMPANIES: 'acvj_followed_companies_v6',
+      VISITED_IDS: 'acvj_visited_ids_v6',
+      FEEDBACK_NOTES: 'acvj_feedback_notes_v6',
+      FEEDBACK_LOGS: 'acvj_feedback_logs_v6',
+      NEGATIVE_RULES: 'acvj_negative_rules_v6',
+      LEARNING_STATE: 'acvj_learning_state_v6',
+      SETTINGS: 'acvj_settings_v6',
+      CACHED_JOBS: 'acvj_cached_jobs_v6'
     };
 
     const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
+    const REQUEST_TIMEOUT_MS = 3500;
 
     const QUICK_KEYWORDS = [
       '全部',
@@ -868,34 +874,12 @@
     };
 
     const CORE_POSITIVE_TERMS = [
-      'automotive',
-      'cybersecurity',
-      'cyber security',
-      'product manager',
-      'product owner',
-      'vp product',
-      'head of product',
-      'csms',
-      'cyber security management system',
-      'r155',
-      'un r155',
-      'unece r155',
-      'vsoc',
-      'vehicle soc',
-      'vehicle security operations',
-      'idps',
-      'intrusion detection',
-      'intrusion prevention',
-      '21434',
-      'iso 21434',
-      'iso/sae 21434',
-      'vehicle',
-      'autonomous',
-      'mobility',
-      'security',
-      'visa',
-      'relocation',
-      'blue card'
+      'automotive', 'cybersecurity', 'cyber security', 'product manager', 'product owner',
+      'vp product', 'head of product', 'csms', 'cyber security management system',
+      'r155', 'un r155', 'unece r155', 'vsoc', 'vehicle soc', 'vehicle security operations',
+      'idps', 'intrusion detection', 'intrusion prevention', '21434', 'iso 21434',
+      'iso/sae 21434', 'vehicle', 'autonomous', 'mobility', 'security', 'visa',
+      'relocation', 'blue card'
     ];
 
     const AUTOMOTIVE_CYBER_VARIANTS = {
@@ -908,55 +892,25 @@
 
     const ROLE_MATCH_VARIANTS = {
       'Product Manager': [
-        'product manager',
-        'senior product manager',
-        'staff product manager',
-        'principal product manager',
-        'lead product manager',
-        'technical product manager'
+        'product manager', 'senior product manager', 'staff product manager',
+        'principal product manager', 'lead product manager', 'technical product manager'
       ],
-      'Product Owner': [
-        'product owner',
-        'senior product owner',
-        'lead product owner'
-      ],
+      'Product Owner': ['product owner', 'senior product owner', 'lead product owner'],
       'VP Product': [
-        'vp product',
-        'vp of product',
-        'vice president of product',
-        'vice president product',
-        'head of product',
-        'director of product'
+        'vp product', 'vp of product', 'vice president of product',
+        'vice president product', 'head of product', 'director of product'
       ],
       'Automotive Cybersecurity': [
-        'automotive cybersecurity',
-        'automotive cyber security',
-        'vehicle cybersecurity',
-        'vehicle cyber security',
-        'connected car security',
-        'automotive security'
+        'automotive cybersecurity', 'automotive cyber security', 'vehicle cybersecurity',
+        'vehicle cyber security', 'connected car security', 'automotive security'
       ]
     };
 
     const VISA_SIGNAL_TERMS = [
-      'visa sponsorship',
-      'visa support',
-      'work visa',
-      'work permit',
-      'relocation',
-      'relocation assistance',
-      'relocation package',
-      'blue card',
-      'eu blue card',
-      'h-1b',
-      'h1b',
-      'o-1',
-      'o1',
-      'lmia',
-      'global talent',
-      'skilled worker',
-      'sponsor visa',
-      'sponsorship available'
+      'visa sponsorship', 'visa support', 'work visa', 'work permit', 'relocation',
+      'relocation assistance', 'relocation package', 'blue card', 'eu blue card',
+      'h-1b', 'h1b', 'o-1', 'o1', 'lmia', 'global talent', 'skilled worker',
+      'sponsor visa', 'sponsorship available'
     ];
 
     const PROTECT_CORE_TOKENS = new Set([
@@ -965,7 +919,6 @@
       'csms', 'r155', 'vsoc', 'idps', '21434', 'iso', 'visa', 'relocation'
     ]);
 
-    // 常见车企 / Tier-1 / 网安企业官方域名、招聘页与 ATS 端点映射库
     const KNOWN_COMPANY_REGISTRY = {
       rivian: { website: 'https://rivian.com', careersUrl: 'https://rivian.com/careers', ats: [{ ats: 'greenhouse', slug: 'rivian' }] },
       polestar: { website: 'https://www.polestar.com', careersUrl: 'https://www.polestar.com/global/careers/', ats: [{ ats: 'greenhouse', slug: 'polestar' }] },
@@ -981,4 +934,1567 @@
       cybellum: { website: 'https://cybellum.com', careersUrl: 'https://cybellum.com/careers/', ats: [{ ats: 'greenhouse', slug: 'cybellum' }] },
       wayve: { website: 'https://wayve.ai', careersUrl: 'https://wayve.ai/careers/', ats: [{ ats: 'greenhouse', slug: 'wayve' }] },
       zoox: { website: 'https://zoox.com', careersUrl: 'https://zoox.com/careers/', ats: [{ ats: 'lever', slug: 'zoox' }] },
-      nuro: { website: 'https
+      nuro: { website: 'https://www.nuro.ai', careersUrl: 'https://www.nuro.ai/careers', ats: [{ ats: 'greenhouse', slug: 'nuro' }] },
+      motional: { website: 'https://motional.com', careersUrl: 'https://motional.com/careers/', ats: [{ ats: 'greenhouse', slug: 'motional' }] },
+      'torc robotics': { website: 'https://torc.ai', careersUrl: 'https://torc.ai/careers/', ats: [{ ats: 'greenhouse', slug: 'torcrobotics' }] },
+      bosch: { website: 'https://www.bosch.com', careersUrl: 'https://www.bosch.com/careers/', ats: [{ ats: 'smartrecruiters', slug: 'BoschGroup' }] },
+      continental: { website: 'https://www.continental.com', careersUrl: 'https://www.continental.com/en/career/', ats: [{ ats: 'smartrecruiters', slug: 'Continental' }] },
+      zf: { website: 'https://www.zf.com', careersUrl: 'https://www.zf.com/mobile/en/company/careers/careers.html', ats: [{ ats: 'smartrecruiters', slug: 'ZFGroup' }] },
+      valeo: { website: 'https://www.valeo.com', careersUrl: 'https://www.valeo.com/en/join-us/', ats: [{ ats: 'smartrecruiters', slug: 'Valeo' }] },
+      forvia: { website: 'https://www.forvia.com', careersUrl: 'https://www.forvia.com/en/careers', ats: [{ ats: 'smartrecruiters', slug: 'FORVIA' }] },
+      magna: { website: 'https://www.magna.com', careersUrl: 'https://www.magna.com/careers', ats: [{ ats: 'smartrecruiters', slug: 'Magna' }] },
+      aptiv: { website: 'https://www.aptiv.com', careersUrl: 'https://www.aptiv.com/en/careers', ats: [{ ats: 'smartrecruiters', slug: 'Aptiv' }] },
+      cariad: { website: 'https://cariad.technology', careersUrl: 'https://cariad.technology/de/en/career.html', ats: [{ ats: 'greenhouse', slug: 'cariad' }] },
+      'volvo cars': { website: 'https://www.volvocars.com', careersUrl: 'https://www.volvocars.com/intl/about/our-company/careers/', ats: [{ ats: 'smartrecruiters', slug: 'VolvoCars' }] }
+    };
+
+    const DEFAULT_GREENHOUSE_BOARDS = ['rivian', 'polestar', 'mobileye', 'aurora', 'appliedintuition'];
+
+    let isRefreshing = false;
+
+    async function fetchWithTimeout(url, options = {}, timeoutMs = REQUEST_TIMEOUT_MS) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        return await fetch(url, { ...options, signal: controller.signal });
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    function normalizeSearchText(input) {
+      return String(input || '')
+        .toLowerCase()
+        .replace(/[\/\-_]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function normalizeCompanyKey(name) {
+      return String(name || '')
+        .toLowerCase()
+        .replace(/\b(inc|ltd|gmbh|ag|se|corp|corporation|limited|co|llc|s\.a\.|b\.v\.)\b\.?/g, '')
+        .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function includesTerm(haystackRaw, termRaw) {
+      const haystack = ` ${normalizeSearchText(haystackRaw)} `;
+      const term = normalizeSearchText(termRaw);
+      if (!term) return false;
+      if (/^\d+$/.test(term)) {
+        return new RegExp(`(^|[^a-z0-9])${term}([^a-z0-9]|$)`).test(haystack);
+      }
+      return haystack.includes(term);
+    }
+
+    function expandKeywordVariants(keyword) {
+      const clean = String(keyword || '').trim();
+      if (!clean || clean === '全部') return [];
+      if (AUTOMOTIVE_CYBER_VARIANTS[clean]) return AUTOMOTIVE_CYBER_VARIANTS[clean];
+      if (ROLE_MATCH_VARIANTS[clean]) return ROLE_MATCH_VARIANTS[clean];
+      return [clean.toLowerCase()];
+    }
+
+    function isCompanyFollowed(companyName, followedList = []) {
+      const target = normalizeCompanyKey(companyName);
+      if (!target) return false;
+      return followedList.some(item => normalizeCompanyKey(item.name || item) === target);
+    }
+
+    function getFollowedMeta(companyName, followedList = []) {
+      const target = normalizeCompanyKey(companyName);
+      return followedList.find(item => normalizeCompanyKey(item.name || item) === target) || null;
+    }
+
+    function checkAutoFilteredByNegativeRules(job, negativeRules = [], learningState = {}, interestedIds = []) {
+      if (interestedIds.includes(job.id)) {
+        return { isAutoFiltered: false, matchedRuleReason: '' };
+      }
+
+      const titleNorm = normalizeSearchText(job.title || '');
+      const companyNorm = normalizeSearchText(job.company || '');
+      const fullNorm = normalizeSearchText(
+        `${job.title || ''} ${job.company || ''} ${job.location || ''} ${job.description || ''} ${job.responsibilities || ''}`
+      );
+
+      for (const rule of negativeRules) {
+        if (!rule) continue;
+
+        if (rule.companyNorm && companyNorm && companyNorm === rule.companyNorm && rule.excludeCompany) {
+          return { isAutoFiltered: true, matchedRuleReason: `同公司负向关联（${job.company}）` };
+        }
+
+        if (Array.isArray(rule.intentPatterns) && rule.intentPatterns.length > 0) {
+          for (const pat of rule.intentPatterns) {
+            if (pat.type === 'no_visa' && /no visa|without visa|cannot sponsor|not sponsor|no sponsorship|citizenship required|us citizen only/.test(fullNorm)) {
+              return { isAutoFiltered: true, matchedRuleReason: '负向反馈规则：明确无签证/身份限制' };
+            }
+            if (pat.type === 'local_language' && /fluent german|german required|c1 german|c2 german|deutschkenntnisse|fließend deutsch|fluent french|french required|c1 french/.test(fullNorm)) {
+              return { isAutoFiltered: true, matchedRuleReason: '负向反馈规则：要求流利本地小语种' };
+            }
+            if (pat.type === 'non_pm' && !/(product manager|product owner|vp product|head of product|director of product)/.test(titleNorm)) {
+              if (/(software engineer|backend engineer|frontend engineer|devops|sales representative|account executive|recruiter|hr )/.test(titleNorm)) {
+                return { isAutoFiltered: true, matchedRuleReason: '负向反馈规则：非产品管理类岗位' };
+              }
+            }
+            if (pat.type === 'non_auto_cyber') {
+              const hasCoreDomain = /(automotive|vehicle|autonomous|mobility|cybersecurity|cyber security|csms|r155|vsoc|idps|21434)/.test(fullNorm);
+              if (!hasCoreDomain) {
+                return { isAutoFiltered: true, matchedRuleReason: '负向反馈规则：与汽车网安核心领域无关' };
+              }
+            }
+          }
+        }
+
+        if (Array.isArray(rule.titleTokens) && rule.titleTokens.length >= 2) {
+          const overlap = rule.titleTokens.filter(tok => includesTerm(titleNorm, tok));
+          if (overlap.length >= 2) {
+            return {
+              isAutoFiltered: true,
+              matchedRuleReason: `与已标「不相关」岗位高度相似（匹配词：${overlap.join(', ')}）`
+            };
+          }
+        }
+
+        if (Array.isArray(rule.customNegativeKeywords) && rule.customNegativeKeywords.length > 0) {
+          const hitCustom = rule.customNegativeKeywords.find(kw => includesTerm(fullNorm, kw));
+          if (hitCustom) {
+            return { isAutoFiltered: true, matchedRuleReason: `命中负向反馈关键词「${hitCustom}」` };
+          }
+        }
+      }
+
+      return { isAutoFiltered: false, matchedRuleReason: '' };
+    }
+
+    function evaluateJobListing(job, learningState = {}, interestedIds = [], negativeRules = [], followedCompanies = []) {
+      const title = String(job.title || '').trim();
+      const company = String(job.company || '').trim();
+      const location = String(job.location || '').trim();
+      const description = String(job.description || job.jd || '').trim();
+      const responsibilities = String(job.responsibilities || '').trim();
+      const tags = Array.isArray(job.tags) ? job.tags.join(' ') : String(job.tags || '');
+
+      const titleNorm = normalizeSearchText(title);
+      const fullText = `${title} ${company} ${location} ${tags} ${description} ${responsibilities}`;
+      const fullNorm = normalizeSearchText(fullText);
+
+      const matchedVisaTerms = VISA_SIGNAL_TERMS.filter(term => fullNorm.includes(normalizeSearchText(term)));
+      const hasVisaSupport = Boolean(
+        job.visaSponsored === true ||
+        job.hasVisaSupport === true ||
+        matchedVisaTerms.length > 0
+      );
+
+      const matchedCyberPillars = Object.keys(AUTOMOTIVE_CYBER_VARIANTS).filter(pillar =>
+        AUTOMOTIVE_CYBER_VARIANTS[pillar].some(variant => includesTerm(fullNorm, variant))
+      );
+
+      const matchedRoleKeywords = Object.keys(ROLE_MATCH_VARIANTS).filter(role =>
+        ROLE_MATCH_VARIANTS[role].some(variant => includesTerm(fullNorm, variant))
+      );
+
+      const matchedPositiveTerms = CORE_POSITIVE_TERMS.filter(term => includesTerm(fullNorm, term));
+      const followedMeta = getFollowedMeta(company, followedCompanies);
+      const followed = Boolean(followedMeta);
+
+      let score = 15;
+      if (hasVisaSupport) score += 25;
+      if (matchedRoleKeywords.length > 0) {
+        score +=
+          includesTerm(titleNorm, 'product manager') ||
+          includesTerm(titleNorm, 'product owner') ||
+          includesTerm(titleNorm, 'vp product') ||
+          includesTerm(titleNorm, 'head of product')
+            ? 22
+            : 14;
+      }
+      if (includesTerm(fullNorm, 'automotive') || includesTerm(fullNorm, 'vehicle') || includesTerm(fullNorm, 'autonomous')) {
+        score += 12;
+      }
+      if (includesTerm(fullNorm, 'cybersecurity') || includesTerm(fullNorm, 'cyber security') || includesTerm(fullNorm, 'security')) {
+        score += 10;
+      }
+      score += Math.min(20, matchedCyberPillars.length * 7);
+      score += Math.min(10, matchedPositiveTerms.length * 1.5);
+
+      const posWeights = learningState.positiveWeights || {};
+      const negWeights = learningState.negativeWeights || {};
+      let learningAdjustment = 0;
+
+      for (const [token, weight] of Object.entries(posWeights)) {
+        const cleanToken = token.replace(/^(company|region):/, '');
+        if (cleanToken && includesTerm(fullNorm, cleanToken)) {
+          learningAdjustment += Number(weight) || 0;
+        }
+      }
+      for (const [token, weight] of Object.entries(negWeights)) {
+        const cleanToken = token.replace(/^(company|region):/, '');
+        if (cleanToken && includesTerm(fullNorm, cleanToken)) {
+          learningAdjustment -= Number(weight) || 0;
+        }
+      }
+
+      if (interestedIds.includes(job.id)) learningAdjustment += 10;
+      if (followed) learningAdjustment += 12;
+
+      const autoFilterCheck = checkAutoFilteredByNegativeRules(job, negativeRules, learningState, interestedIds);
+      if (autoFilterCheck.isAutoFiltered) learningAdjustment -= 30;
+
+      const finalScore = Math.max(0, Math.min(100, Math.round(score + learningAdjustment)));
+
+      const matchedKeywords = Array.from(
+        new Set([
+          ...matchedRoleKeywords,
+          ...matchedCyberPillars,
+          ...(includesTerm(fullNorm, 'automotive') && includesTerm(fullNorm, 'security')
+            ? ['Automotive Cybersecurity']
+            : [])
+        ])
+      );
+
+      return {
+        ...job,
+        isFollowedCompany: followed,
+        officialWebsite: job.officialWebsite || followedMeta?.website || '',
+        officialCareersUrl: job.officialCareersUrl || followedMeta?.careersUrl || '',
+        hasVisaSupport,
+        matchedVisaTerms,
+        matchedCyberPillars,
+        matchedRoleKeywords,
+        matchedPositiveTerms,
+        matchedKeywords,
+        baseScore: Math.min(100, Math.round(score)),
+        learningAdjustment: Math.round(learningAdjustment * 10) / 10,
+        recommendationScore: finalScore,
+        isAutoFiltered: autoFilterCheck.isAutoFiltered,
+        autoFilterReason: autoFilterCheck.matchedRuleReason,
+        isDomainMatch:
+          matchedRoleKeywords.length > 0 ||
+          matchedCyberPillars.length > 0 ||
+          (includesTerm(fullNorm, 'automotive') && includesTerm(fullNorm, 'security')) ||
+          (includesTerm(fullNorm, 'product') && (includesTerm(fullNorm, 'security') || includesTerm(fullNorm, 'vehicle')))
+      };
+    }
+
+    function loadJsonStorage(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (_) {
+        return fallback;
+      }
+    }
+
+    function saveJsonStorage(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (_) {}
+    }
+
+    let state = {
+      jobs: [],
+      selectedKeyword: '全部',
+      searchQuery: '',
+      region: 'ALL',
+      mode: 'ALL',
+      sortBy: 'SCORE',
+      visaOnly: true,
+      followedOnly: false,
+      interestedOnly: false,
+      showIrrelevant: false,
+      activeDetailId: null,
+      pendingFeedback: null,
+      irrelevantIds: loadJsonStorage(STORAGE_KEYS.IRRELEVANT_IDS, []),
+      interestedIds: loadJsonStorage(STORAGE_KEYS.INTERESTED_IDS, []),
+      followedCompanies: loadJsonStorage(STORAGE_KEYS.FOLLOWED_COMPANIES, []),
+      visitedIds: loadJsonStorage(STORAGE_KEYS.VISITED_IDS, []),
+      feedbackNotes: loadJsonStorage(STORAGE_KEYS.FEEDBACK_NOTES, {}),
+      feedbackLogs: loadJsonStorage(STORAGE_KEYS.FEEDBACK_LOGS, []),
+      negativeRules: loadJsonStorage(STORAGE_KEYS.NEGATIVE_RULES, []),
+      learning: loadJsonStorage(STORAGE_KEYS.LEARNING_STATE, {
+        positiveWeights: {},
+        negativeWeights: {}
+      }),
+      settings: loadJsonStorage(STORAGE_KEYS.SETTINGS, {
+        customJsonFeeds: [],
+        greenhouseBoards: DEFAULT_GREENHOUSE_BOARDS,
+        customCompanySlugs: {},
+        jsearchKey: ''
+      })
+    };
+
+    function detectRegion(locationStr = '') {
+      const loc = locationStr.toLowerCase();
+      if (/germany|deutschland|munich|münchen|berlin|stuttgart|wolfsburg|netherlands|amsterdam|eindhoven|ireland|dublin|sweden|stockholm|gothenburg|france|paris|spain|madrid|barcelona|uk|united kingdom|london|poland|warsaw|europe|eu\b/.test(loc)) {
+        return 'EU';
+      }
+      if (/united states|usa|\bus\b|canada|toronto|vancouver|montreal|michigan|detroit|california|austin|seattle|new york/.test(loc)) {
+        return 'NA';
+      }
+      if (/remote|worldwide|global|anywhere/.test(loc)) {
+        return 'REMOTE';
+      }
+      return 'OTHER';
+    }
+
+    function detectWorkMode(job) {
+      const text = `${job.title || ''} ${job.location || ''} ${job.workMode || ''}`.toLowerCase();
+      if (text.includes('remote')) return 'Remote';
+      if (text.includes('hybrid')) return 'Hybrid';
+      if (text.includes('on-site') || text.includes('onsite') || text.includes('on site')) return 'On-site';
+      return job.workMode || 'Hybrid';
+    }
+
+    function stripHtml(html = '') {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      return (div.textContent || div.innerText || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function showFeedbackToast(message) {
+      const banner = document.getElementById('feedbackToastBanner');
+      document.getElementById('feedbackToastText').textContent = message;
+      banner.classList.add('show');
+    }
+
+    async function discoverCompanyWebsiteAndCareers(companyName, seedJobUrl = '') {
+      const normKey = normalizeCompanyKey(companyName);
+      const compactSlug = normKey.replace(/\s+/g, '');
+      const hyphenSlug = normKey.replace(/\s+/g, '-');
+
+      let website = '';
+      let careersUrl = '';
+      const atsCandidates = [];
+
+      const customMap = state.settings.customCompanySlugs || {};
+      for (const [k, v] of Object.entries(customMap)) {
+        if (normalizeCompanyKey(k) === normKey && v) {
+          const val = String(v).trim();
+          if (/^https?:\/\//i.test(val)) {
+            careersUrl = val;
+            try {
+              website = new URL(val).origin;
+            } catch (_) {}
+          } else if (val.includes(':')) {
+            const [ats, slug] = val.split(':');
+            if (ats && slug) atsCandidates.push({ ats: ats.trim().toLowerCase(), slug: slug.trim() });
+          }
+        }
+      }
+
+      if (KNOWN_COMPANY_REGISTRY[normKey]) {
+        const reg = KNOWN_COMPANY_REGISTRY[normKey];
+        website = website || reg.website || '';
+        careersUrl = careersUrl || reg.careersUrl || '';
+        if (Array.isArray(reg.ats)) atsCandidates.push(...reg.ats);
+      }
+
+      if (!website && seedJobUrl) {
+        try {
+          const u = new URL(seedJobUrl);
+          if (!/(linkedin|indeed|glassdoor|greenhouse|lever|ashby|smartrecruiters|arbeitnow|remotive|jobicy)/i.test(u.hostname)) {
+            website = u.origin;
+          }
+        } catch (_) {}
+      }
+
+      if (!website && compactSlug.length >= 2) {
+        website = `https://www.${compactSlug}.com`;
+      }
+      if (!careersUrl && website) {
+        careersUrl = `${website}/careers`;
+      }
+
+      const slugSet = Array.from(new Set([compactSlug, hyphenSlug, normKey.split(' ')[0]].filter(s => s && s.length >= 2)));
+      slugSet.forEach(slug => {
+        atsCandidates.push({ ats: 'greenhouse', slug });
+        atsCandidates.push({ ats: 'lever', slug });
+        atsCandidates.push({ ats: 'ashby', slug });
+      });
+      const titleSlug = String(companyName || '').replace(/[^a-zA-Z0-9]/g, '');
+      if (titleSlug.length >= 2) {
+        atsCandidates.push({ ats: 'smartrecruiters', slug: titleSlug });
+      }
+
+      const seenAts = new Set();
+      const uniqueAts = atsCandidates.filter(c => {
+        const k = `${c.ats}:${c.slug.toLowerCase()}`;
+        if (seenAts.has(k)) return false;
+        seenAts.add(k);
+        return true;
+      }).slice(0, 6);
+
+      return {
+        website: website || `https://www.google.com/search?q=${encodeURIComponent(`${companyName} official website`)}`,
+        careersUrl: careersUrl || `https://www.google.com/search?q=${encodeURIComponent(`${companyName} careers open positions vacancies`)}`,
+        atsCandidates: uniqueAts
+      };
+    }
+
+    async function fetchLeverBoard(slug, displayCompany, website, careersUrl) {
+      try {
+        const res = await fetchWithTimeout(`https://api.lever.co/v0/postings/${encodeURIComponent(slug)}?mode=json`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        if (!Array.isArray(data)) return [];
+        return data.map(item => ({
+          id: `lever-${slug}-${item.id}`,
+          title: item.text,
+          company: displayCompany || slug,
+          location: item.categories?.location || item.workplaceType || '',
+          workMode: item.workplaceType || '',
+          description: item.descriptionPlain || item.description || '',
+          url: item.hostedUrl || item.applyUrl,
+          officialWebsite: website,
+          officialCareersUrl: careersUrl,
+          publishedAt: item.createdAt ? new Date(item.createdAt).toISOString() : new Date().toISOString(),
+          source: `官网 Open Positions·Lever (${displayCompany || slug})`,
+          isOfficialCareerFeed: true
+        }));
+      } catch (_) {
+        return [];
+      }
+    }
+
+    async function fetchAshbyBoard(slug, displayCompany, website, careersUrl) {
+      try {
+        const res = await fetchWithTimeout(`https://api.ashbyhq.com/posting-api/job-board/${encodeURIComponent(slug)}`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        const jobs = data.jobs || [];
+        return jobs.map((item, idx) => ({
+          id: `ashby-${slug}-${item.id || idx}`,
+          title: item.title,
+          company: displayCompany || slug,
+          location: item.location || '',
+          workMode: item.isRemote ? 'Remote' : '',
+          description: item.descriptionPlain || item.descriptionHtml || '',
+          url: item.jobUrl || item.applyUrl,
+          officialWebsite: website,
+          officialCareersUrl: careersUrl,
+          publishedAt: item.publishedAt || new Date().toISOString(),
+          source: `官网 Open Positions·Ashby (${displayCompany || slug})`,
+          isOfficialCareerFeed: true
+        }));
+      } catch (_) {
+        return [];
+      }
+    }
+
+    async function fetchSmartRecruitersBoard(slug, displayCompany, website, careersUrl) {
+      try {
+        const res = await fetchWithTimeout(`https://api.smartrecruiters.com/v1/companies/${encodeURIComponent(slug)}/postings?limit=100`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        const content = data.content || [];
+        return content.map(item => ({
+          id: `sr-${slug}-${item.id}`,
+          title: item.name,
+          company: displayCompany || item.company?.name || slug,
+          location: [item.location?.city, item.location?.region, item.location?.country].filter(Boolean).join(', '),
+          workMode: item.location?.remote ? 'Remote' : '',
+          description: `${item.department?.label || ''} ${item.function?.label || ''} ${item.experienceLevel?.label || ''}`.trim(),
+          url: `https://jobs.smartrecruiters.com/${encodeURIComponent(slug)}/${item.id}`,
+          officialWebsite: website,
+          officialCareersUrl: careersUrl,
+          publishedAt: item.releasedDate || new Date().toISOString(),
+          source: `官网 Vacancies·SmartRecruiters (${displayCompany || slug})`,
+          isOfficialCareerFeed: true
+        }));
+      } catch (_) {
+        return [];
+      }
+    }
+
+    async function fetchGreenhouseBoard(token, displayCompany = '', isOfficialFollow = false, website = '', careersUrl = '') {
+      const cleanToken = String(token || '').trim();
+      if (!cleanToken) return [];
+      try {
+        const res = await fetchWithTimeout(`https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(cleanToken)}/jobs?content=true`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        const compLabel = displayCompany || cleanToken.toUpperCase();
+        return (data.jobs || []).map(item => ({
+          id: `gh-${cleanToken}-${item.id}`,
+          title: item.title,
+          company: compLabel,
+          location: item.location?.name || '',
+          description: item.content || '',
+          url: item.absolute_url,
+          officialWebsite: website,
+          officialCareersUrl: careersUrl,
+          publishedAt: item.updated_at || new Date().toISOString(),
+          source: isOfficialFollow ? `官网 Open Positions·Greenhouse (${compLabel})` : `Greenhouse:${cleanToken}`,
+          isOfficialCareerFeed: isOfficialFollow
+        }));
+      } catch (_) {
+        return [];
+      }
+    }
+
+    async function crawlFollowedCompanyCareers(companyName, silent = false) {
+      const displayCompany = String(companyName || '').trim();
+      if (!displayCompany) return { totalRaw: 0, matchedAdded: 0 };
+
+      try {
+        const seedJob = state.jobs.find(j => normalizeCompanyKey(j.company) === normalizeCompanyKey(displayCompany));
+        const discovery = await discoverCompanyWebsiteAndCareers(displayCompany, seedJob?.url || '');
+
+        const normKey = normalizeCompanyKey(displayCompany);
+        state.followedCompanies = state.followedCompanies.map(item => {
+          if (normalizeCompanyKey(item.name || item) === normKey) {
+            return {
+              ...(typeof item === 'object' ? item : { name: item }),
+              name: displayCompany,
+              website: discovery.website,
+              careersUrl: discovery.careersUrl
+            };
+          }
+          return item;
+        });
+        saveJsonStorage(STORAGE_KEYS.FOLLOWED_COMPANIES, state.followedCompanies);
+        renderFollowedBar();
+
+        let rawOfficialJobs = [];
+        for (const cand of discovery.atsCandidates) {
+          let batch = [];
+          if (cand.ats === 'greenhouse') {
+            batch = await fetchGreenhouseBoard(cand.slug, displayCompany, true, discovery.website, discovery.careersUrl);
+          } else if (cand.ats === 'lever') {
+            batch = await fetchLeverBoard(cand.slug, displayCompany, discovery.website, discovery.careersUrl);
+          } else if (cand.ats === 'ashby') {
+            batch = await fetchAshbyBoard(cand.slug, displayCompany, discovery.website, discovery.careersUrl);
+          } else if (cand.ats === 'smartrecruiters') {
+            batch = await fetchSmartRecruitersBoard(cand.slug, displayCompany, discovery.website, discovery.careersUrl);
+          }
+          if (batch.length > 0) {
+            rawOfficialJobs = batch;
+            break;
+          }
+        }
+
+        if (rawOfficialJobs.length === 0) {
+          reScoreAndRender();
+          if (!silent) {
+            showFeedbackToast(
+              `已关注「${displayCompany}」并定位官网（${discovery.website}）。您可在顶部「${displayCompany} 招聘页 ↗」直达查看或在「数据源配置」手动绑定 ATS Slug。`
+            );
+          }
+          return { totalRaw: 0, matchedAdded: 0 };
+        }
+
+        const evaluatedOfficial = rawOfficialJobs.map(j =>
+          evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies)
+        );
+        const matchedOfficial = evaluatedOfficial.filter(
+          j => j.isDomainMatch || j.hasVisaSupport || j.recommendationScore >= 42
+        );
+
+        const existingKeys = new Set(
+          state.jobs.map(j => `${normalizeSearchText(j.title)}|${normalizeCompanyKey(j.company)}|${normalizeSearchText(j.location)}`)
+        );
+
+        let addedCount = 0;
+        for (const item of matchedOfficial) {
+          const key = `${normalizeSearchText(item.title)}|${normalizeCompanyKey(item.company)}|${normalizeSearchText(item.location)}`;
+          if (!existingKeys.has(key)) {
+            existingKeys.add(key);
+            state.jobs.push(item);
+            addedCount++;
+          }
+        }
+
+        if (addedCount > 0) {
+          saveJsonStorage(STORAGE_KEYS.CACHED_JOBS, { timestamp: Date.now(), jobs: state.jobs });
+        }
+
+        reScoreAndRender();
+
+        if (!silent) {
+          showFeedbackToast(
+            `已在「${displayCompany}」官网招聘接口检出 ${rawOfficialJobs.length} 个职位，匹配 ${matchedOfficial.length} 个相关岗位（新增 ${addedCount} 个并完成推荐分计算）。`
+          );
+        }
+
+        return { totalRaw: rawOfficialJobs.length, matchedAdded: addedCount };
+      } catch (_) {
+        reScoreAndRender();
+        return { totalRaw: 0, matchedAdded: 0 };
+      }
+    }
+
+    async function syncAllFollowedCompanies() {
+      if (!state.followedCompanies.length) {
+        showFeedbackToast('当前尚未关注任何公司，请先在职位卡片的公司名称旁点击「+ 关注」。');
+        return;
+      }
+      const btn = document.getElementById('syncFollowedBtn');
+      btn.disabled = true;
+      btn.textContent = '同步中...';
+      try {
+        const results = await Promise.allSettled(
+          state.followedCompanies.map(item => crawlFollowedCompanyCareers(item.name || item, true))
+        );
+        const totalAdded = results.reduce((sum, r) => sum + (r.status === 'fulfilled' ? (r.value?.matchedAdded || 0) : 0), 0);
+        showFeedbackToast(`已完成 ${state.followedCompanies.length} 家关注公司官网同步，共新增 ${totalAdded} 个匹配职位。`);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '同步关注公司官网';
+      }
+    }
+
+    async function toggleFollowCompany(companyName) {
+      const cleanName = String(companyName || '').trim();
+      if (!cleanName) return;
+
+      const normKey = normalizeCompanyKey(cleanName);
+      const exists = state.followedCompanies.some(item => normalizeCompanyKey(item.name || item) === normKey);
+
+      if (exists) {
+        state.followedCompanies = state.followedCompanies.filter(item => normalizeCompanyKey(item.name || item) !== normKey);
+        delete state.learning.positiveWeights[`company:${cleanName.toLowerCase()}`];
+        saveJsonStorage(STORAGE_KEYS.FOLLOWED_COMPANIES, state.followedCompanies);
+        saveJsonStorage(STORAGE_KEYS.LEARNING_STATE, state.learning);
+        renderFollowedBar();
+        reScoreAndRender();
+        showFeedbackToast(`已取消关注「${cleanName}」。`);
+      } else {
+        state.followedCompanies.unshift({ name: cleanName, followedAt: new Date().toISOString() });
+        state.learning.positiveWeights[`company:${cleanName.toLowerCase()}`] = 6.0;
+        saveJsonStorage(STORAGE_KEYS.FOLLOWED_COMPANIES, state.followedCompanies);
+        saveJsonStorage(STORAGE_KEYS.LEARNING_STATE, state.learning);
+        renderFollowedBar();
+        reScoreAndRender();
+        await crawlFollowedCompanyCareers(cleanName, false);
+      }
+
+      if (state.activeDetailId && document.getElementById('detailModal').classList.contains('open')) {
+        openDetailModal(state.activeDetailId);
+      }
+    }
+
+    function renderFollowedBar() {
+      const bar = document.getElementById('followedCompaniesBar');
+      if (!state.followedCompanies.length) {
+        bar.classList.remove('show');
+        bar.innerHTML = '';
+        return;
+      }
+
+      bar.classList.add('show');
+      const label = '<span style="color:#fde68a;font-weight:600;">已关注公司（官网 &amp; Open Positions）：</span>';
+      const pills = state.followedCompanies
+        .map(item => {
+          const name = item.name || item;
+          const siteUrl = item.website || `https://www.google.com/search?q=${encodeURIComponent(`${name} official website`)}`;
+          const careerUrl = item.careersUrl || `https://www.google.com/search?q=${encodeURIComponent(`${name} careers open positions vacancies`)}`;
+          return `
+            <span class="followed-pill">
+              <strong>${escapeHtml(name)}</strong>
+              <a href="${escapeAttr(siteUrl)}" target="_blank" rel="noopener noreferrer" style="color:#93c5fd;text-decoration:none;">官网 ↗</a>
+              <a href="${escapeAttr(careerUrl)}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;">招聘页 ↗</a>
+              <button type="button" data-resync-company="${escapeAttr(name)}">重抓</button>
+              <button type="button" data-unfollow-company="${escapeAttr(name)}">×</button>
+            </span>
+          `;
+        })
+        .join('');
+
+      bar.innerHTML = label + pills;
+
+      bar.querySelectorAll('button[data-resync-company]').forEach(btn => {
+        btn.addEventListener('click', () => crawlFollowedCompanyCareers(btn.getAttribute('data-resync-company'), false));
+      });
+
+      bar.querySelectorAll('button[data-unfollow-company]').forEach(btn => {
+        btn.addEventListener('click', () => toggleFollowCompany(btn.getAttribute('data-unfollow-company')));
+      });
+    }
+
+    function extractFeaturesForLearning(job) {
+      const titleTokens = normalizeSearchText(job.title)
+        .split(' ')
+        .filter(w => w.length >= 3 && !['the', 'and', 'for', 'with', 'role', 'job', 'senior', 'lead'].includes(w));
+      const companyKey = job.company ? `company:${job.company.toLowerCase().trim()}` : null;
+      const regionKey = `region:${detectRegion(job.location)}`;
+      return Array.from(new Set([...titleTokens.slice(0, 6), ...(job.matchedCyberPillars || []).map(s => s.toLowerCase()), companyKey, regionKey].filter(Boolean)));
+    }
+
+    function extractReasonTokens(reasonText = '') {
+      const raw = String(reasonText || '').trim();
+      if (!raw) return [];
+      const tokens = new Set();
+
+      const enMatches = raw.toLowerCase().match(/[a-z0-9][a-z0-9\-\/]{1,24}/g) || [];
+      enMatches.forEach(tok => {
+        if (!['the', 'and', 'for', 'not', 'no', 'yes', 'with'].includes(tok)) {
+          tokens.add(tok);
+        }
+      });
+
+      const zhMappings = [
+        { pattern: /签证|工签|担保|蓝卡|移民|搬迁/, mapped: ['visa', 'relocation', 'blue card'] },
+        { pattern: /德语|法语|本地语言|小语种/, mapped: ['german', 'french', 'fluent'] },
+        { pattern: /研发|开发|代码|纯技术|工程师/, mapped: ['engineer', 'developer', 'software'] },
+        { pattern: /销售|市场|商务/, mapped: ['sales', 'marketing', 'account'] },
+        { pattern: /产品|负责人|总监|vp|po|pm/i, mapped: ['product manager', 'product owner', 'vp product'] },
+        { pattern: /远程|居家/, mapped: ['remote'] }
+      ];
+
+      zhMappings.forEach(item => {
+        if (item.pattern.test(raw)) {
+          item.mapped.forEach(m => tokens.add(m));
+        }
+      });
+
+      const zhMatches = raw.match(/[\u4e00-\u9fa5]{2,8}/g) || [];
+      zhMatches.slice(0, 4).forEach(z => tokens.add(z));
+
+      return Array.from(tokens).slice(0, 10);
+    }
+
+    function buildNegativeRuleFromJob(job, cleanReason = '') {
+      const titleTokens = normalizeSearchText(job.title)
+        .split(' ')
+        .filter(w => w.length >= 3 && !PROTECT_CORE_TOKENS.has(w) && !['senior', 'lead', 'staff', 'principal', 'junior', 'intern', 'the', 'and', 'for', 'with'].includes(w));
+
+      const intentPatterns = [];
+      if (/无签证|不提供签证|担保|公民|身份/.test(cleanReason)) intentPatterns.push({ type: 'no_visa' });
+      if (/德语|法语|本地语言|小语种/.test(cleanReason)) intentPatterns.push({ type: 'local_language' });
+      if (/非产品|纯研发|纯技术|销售|市场/.test(cleanReason)) intentPatterns.push({ type: 'non_pm' });
+      if (/无关|汽车网安|csms|r155/i.test(cleanReason) && /无关|不符|不匹配/.test(cleanReason)) {
+        intentPatterns.push({ type: 'non_auto_cyber' });
+      }
+
+      const customNegativeKeywords = (cleanReason.toLowerCase().match(/[a-z0-9][a-z0-9\-\/]{2,24}/g) || [])
+        .filter(tok => !PROTECT_CORE_TOKENS.has(tok) && !['no', 'not', 'non', 'for', 'and', 'with'].includes(tok));
+
+      const excludeCompany = /公司|企业|黑名单|不考虑该厂/.test(cleanReason);
+
+      return {
+        sourceJobId: job.id,
+        companyNorm: normalizeSearchText(job.company || ''),
+        excludeCompany,
+        titleTokens: Array.from(new Set(titleTokens)).slice(0, 5),
+        intentPatterns,
+        customNegativeKeywords: Array.from(new Set(customNegativeKeywords)).slice(0, 5),
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    function handleFeedbackButtonClick(jobId, type) {
+      if (type === 'irrelevant' && state.irrelevantIds.includes(jobId)) {
+        state.irrelevantIds = state.irrelevantIds.filter(id => id !== jobId);
+        state.negativeRules = state.negativeRules.filter(r => r.sourceJobId !== jobId);
+        delete state.feedbackNotes[jobId];
+        saveJsonStorage(STORAGE_KEYS.IRRELEVANT_IDS, state.irrelevantIds);
+        saveJsonStorage(STORAGE_KEYS.NEGATIVE_RULES, state.negativeRules);
+        saveJsonStorage(STORAGE_KEYS.FEEDBACK_NOTES, state.feedbackNotes);
+        reScoreAndRender();
+        showFeedbackToast('已撤销「不相关」标记，并恢复关联的相似岗位展示。');
+        if (state.activeDetailId === jobId && document.getElementById('detailModal').classList.contains('open')) {
+          openDetailModal(jobId);
+        }
+        return;
+      }
+
+      if (type === 'interested' && state.interestedIds.includes(jobId)) {
+        state.interestedIds = state.interestedIds.filter(id => id !== jobId);
+        delete state.feedbackNotes[jobId];
+        saveJsonStorage(STORAGE_KEYS.INTERESTED_IDS, state.interestedIds);
+        saveJsonStorage(STORAGE_KEYS.FEEDBACK_NOTES, state.feedbackNotes);
+        reScoreAndRender();
+        showFeedbackToast('已撤销「感兴趣」标记并重新计算推荐排序。');
+        if (state.activeDetailId === jobId && document.getElementById('detailModal').classList.contains('open')) {
+          openDetailModal(jobId);
+        }
+        return;
+      }
+
+      openFeedbackInputModal(jobId, type);
+    }
+
+    function openFeedbackInputModal(jobId, type) {
+      const job = state.jobs.find(j => j.id === jobId);
+      if (!job) return;
+      state.pendingFeedback = { jobId, type };
+
+      const isPos = type === 'interested';
+      document.getElementById('feedbackModalTitle').textContent = isPos
+        ? `标记「感兴趣」— 添加正向偏好说明（选填）`
+        : `标记「不相关」— 添加排除原因说明（选填）`;
+
+      document.getElementById('feedbackModalDesc').textContent = isPos
+        ? `岗位：${job.title}（${job.company}）。提交后将立即拉升当前列表中同类高匹配岗位的排序。`
+        : `岗位：${job.title}（${job.company}）。提交后将立即从当前列表中删减与该负向反馈相关的相似岗位。`;
+
+      const presets = QUICK_FEEDBACK_PRESETS[type] || [];
+      const chipsEl = document.getElementById('quickReasonChips');
+      chipsEl.innerHTML = presets
+        .map(text => `<button type="button" class="quick-reason-chip" data-preset="${escapeAttr(text)}">+ ${escapeHtml(text)}</button>`)
+        .join('');
+
+      const textarea = document.getElementById('feedbackReasonTextarea');
+      textarea.value = '';
+
+      chipsEl.querySelectorAll('button[data-preset]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const val = btn.getAttribute('data-preset');
+          textarea.value = textarea.value.trim() ? `${textarea.value.trim()}；${val}` : val;
+          textarea.focus();
+        });
+      });
+
+      document.getElementById('feedbackInputModal').classList.add('open');
+    }
+
+    function commitPendingFeedback(reasonText = '') {
+      if (!state.pendingFeedback) return;
+      const { jobId, type } = state.pendingFeedback;
+      const job = state.jobs.find(j => j.id === jobId);
+      const cleanReason = String(reasonText || '').trim();
+
+      state.pendingFeedback = null;
+      document.getElementById('feedbackInputModal').classList.remove('open');
+
+      if (!job) return;
+
+      const beforeVisibleCount = getFilteredJobs().length;
+      const baseFeatures = extractFeaturesForLearning(job);
+      const reasonTokens = extractReasonTokens(cleanReason);
+
+      if (type === 'interested') {
+        state.irrelevantIds = state.irrelevantIds.filter(id => id !== jobId);
+        state.negativeRules = state.negativeRules.filter(r => r.sourceJobId !== jobId);
+        if (!state.interestedIds.includes(jobId)) state.interestedIds.push(jobId);
+        baseFeatures.forEach(feat => {
+          state.learning.positiveWeights[feat] = Math.min(25, (state.learning.positiveWeights[feat] || 0) + 3.0);
+        });
+        reasonTokens.forEach(tok => {
+          state.learning.positiveWeights[tok] = Math.min(25, (state.learning.positiveWeights[tok] || 0) + 4.0);
+        });
+      } else {
+        state.interestedIds = state.interestedIds.filter(id => id !== jobId);
+        if (!state.irrelevantIds.includes(jobId)) state.irrelevantIds.push(jobId);
+        baseFeatures.forEach(feat => {
+          state.learning.negativeWeights[feat] = Math.min(25, (state.learning.negativeWeights[feat] || 0) + 3.0);
+        });
+        reasonTokens.forEach(tok => {
+          state.learning.negativeWeights[tok] = Math.min(25, (state.learning.negativeWeights[tok] || 0) + 4.0);
+        });
+        state.negativeRules = state.negativeRules.filter(r => r.sourceJobId !== jobId);
+        state.negativeRules.unshift(buildNegativeRuleFromJob(job, cleanReason));
+      }
+
+      if (cleanReason) {
+        state.feedbackNotes[jobId] = { type, reason: cleanReason, updatedAt: new Date().toISOString() };
+      } else {
+        delete state.feedbackNotes[jobId];
+      }
+
+      state.feedbackLogs.unshift({
+        type,
+        jobId,
+        title: job.title,
+        company: job.company,
+        reason: cleanReason,
+        extractedTokens: reasonTokens,
+        timestamp: new Date().toISOString()
+      });
+      state.feedbackLogs = state.feedbackLogs.slice(0, 50);
+
+      saveJsonStorage(STORAGE_KEYS.IRRELEVANT_IDS, state.irrelevantIds);
+      saveJsonStorage(STORAGE_KEYS.INTERESTED_IDS, state.interestedIds);
+      saveJsonStorage(STORAGE_KEYS.FEEDBACK_NOTES, state.feedbackNotes);
+      saveJsonStorage(STORAGE_KEYS.FEEDBACK_LOGS, state.feedbackLogs);
+      saveJsonStorage(STORAGE_KEYS.NEGATIVE_RULES, state.negativeRules);
+      saveJsonStorage(STORAGE_KEYS.LEARNING_STATE, state.learning);
+
+      reScoreAndRender();
+
+      const afterVisibleCount = getFilteredJobs().length;
+      if (type === 'irrelevant') {
+        const removedTotal = Math.max(1, beforeVisibleCount - afterVisibleCount);
+        const similarRemoved = Math.max(0, removedTotal - 1);
+        showFeedbackToast(
+          similarRemoved > 0
+            ? `已标记「${job.title}」为不相关，并联动从当前面板自动删减了 ${similarRemoved} 个负向相关岗位（共移除 ${removedTotal} 个）。`
+            : `已标记「${job.title}」为不相关并从当前面板移除，后续抓取将自动降权同类岗位。`
+        );
+      } else {
+        showFeedbackToast(`已标记「${job.title}」为感兴趣，当前面板已按最新正向偏好重新计算推荐分并置顶高契合岗位。`);
+      }
+
+      if (state.activeDetailId === jobId && document.getElementById('detailModal').classList.contains('open')) {
+        if (type === 'irrelevant' && !state.showIrrelevant) {
+          document.getElementById('detailModal').classList.remove('open');
+        } else {
+          openDetailModal(jobId);
+        }
+      }
+    }
+
+    function markVisited(jobId) {
+      if (!jobId || state.visitedIds.includes(jobId)) return;
+      state.visitedIds.push(jobId);
+      const job = state.jobs.find(j => j.id === jobId);
+      if (job) {
+        extractFeaturesForLearning(job).forEach(feat => {
+          state.learning.positiveWeights[feat] = Math.min(20, (state.learning.positiveWeights[feat] || 0) + 1.5);
+        });
+      }
+      saveJsonStorage(STORAGE_KEYS.VISITED_IDS, state.visitedIds);
+      saveJsonStorage(STORAGE_KEYS.LEARNING_STATE, state.learning);
+      reScoreAndRender();
+    }
+
+    function buildAdaptiveSearchQuery() {
+      const baseTerms = state.selectedKeyword && state.selectedKeyword !== '全部'
+        ? [state.selectedKeyword]
+        : ['Product Manager', 'Automotive Cybersecurity', 'CSMS', 'R155', 'VSOC', 'IDPS', '21434'];
+
+      const negEntries = Object.entries(state.learning.negativeWeights || {})
+        .filter(([k]) => !k.startsWith('company:') && !k.startsWith('region:') && /^[a-z0-9\-\/]+$/i.test(k))
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 4)
+        .map(([k]) => `-${k}`);
+
+      const posEntries = Object.entries(state.learning.positiveWeights || {})
+        .filter(([k]) => !k.startsWith('company:') && !k.startsWith('region:') && /^[a-z0-9\-\/]+$/i.test(k))
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 4)
+        .map(([k]) => k);
+
+      return `${baseTerms.join(' ')} ${posEntries.join(' ')} ${negEntries.join(' ')} visa relocation`.trim();
+    }
+
+    function renderExternalBoards() {
+      const q = encodeURIComponent(buildAdaptiveSearchQuery());
+      const boards = [
+        { name: 'LinkedIn Jobs', url: `https://www.linkedin.com/jobs/search/?keywords=${q}` },
+        { name: 'Indeed Global', url: `https://www.indeed.com/jobs?q=${q}` },
+        { name: 'Canada Job Bank', url: `https://www.jobbank.gc.ca/jobsearch/jobsearch?searchstring=${q}` },
+        { name: 'StepStone DE (蓝卡/汽车)', url: `https://www.stepstone.de/jobs/${encodeURIComponent(state.selectedKeyword === '全部' ? 'Automotive Cybersecurity Product Manager' : state.selectedKeyword)}.html` },
+        { name: 'EuroJobsites / EU', url: `https://www.eurojobsites.com/search-jobs/?keywords=${q}` }
+      ];
+
+      document.getElementById('externalBoardsBar').innerHTML = boards
+        .map(b => `<a class="board-link" href="${b.url}" target="_blank" rel="noopener noreferrer">${b.name} ↗</a>`)
+        .join('');
+    }
+
+    function renderQuickKeywords() {
+      const container = document.getElementById('quickKeywordsContainer');
+      const labelHtml = '<span class="chip-label">快捷关键词：</span>';
+      const chipsHtml = QUICK_KEYWORDS.map(kw => {
+        const activeClass = state.selectedKeyword === kw ? 'active-chip' : '';
+        return `<button type="button" class="${activeClass}" data-kw="${kw}">${kw}</button>`;
+      }).join('');
+      container.innerHTML = labelHtml + chipsHtml;
+
+      container.querySelectorAll('button[data-kw]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.selectedKeyword = btn.getAttribute('data-kw');
+          renderQuickKeywords();
+          renderExternalBoards();
+          renderJobs();
+        });
+      });
+    }
+
+    function reScoreAndRender() {
+      state.jobs = state.jobs.map(job =>
+        evaluateJobListing(job, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies)
+      );
+      renderExternalBoards();
+      renderJobs();
+    }
+
+    function getFilteredJobs() {
+      const q = normalizeSearchText(state.searchQuery);
+      const selectedVariants = expandKeywordVariants(state.selectedKeyword);
+
+      const list = state.jobs.filter(job => {
+        const isManualIrrelevant = state.irrelevantIds.includes(job.id);
+        const isAutoFiltered = Boolean(job.isAutoFiltered);
+        const isExcluded = isManualIrrelevant || isAutoFiltered;
+        const isInterested = state.interestedIds.includes(job.id);
+        const isFollowed = Boolean(job.isFollowedCompany);
+
+        if (isExcluded && !state.showIrrelevant) return false;
+        if (state.followedOnly && !isFollowed) return false;
+        if (state.interestedOnly && !isInterested) return false;
+        if (state.visaOnly && !job.hasVisaSupport && !job.isOfficialCareerFeed) return false;
+        if (state.region !== 'ALL' && detectRegion(job.location) !== state.region) return false;
+        if (state.mode !== 'ALL' && detectWorkMode(job) !== state.mode) return false;
+
+        const haystack = `${job.title || ''} ${job.company || ''} ${job.location || ''} ${job.description || ''} ${job.responsibilities || ''} ${(job.tags || []).join(' ')}`;
+
+        if (selectedVariants.length > 0) {
+          const matchesChip = selectedVariants.some(v => includesTerm(haystack, v));
+          if (!matchesChip) return false;
+        }
+
+        if (q) {
+          const tokens = q.split(' ').filter(Boolean);
+          const matchesSearch = tokens.every(tok => includesTerm(haystack, tok));
+          if (!matchesSearch) return false;
+        }
+
+        return true;
+      });
+
+      if (state.sortBy === 'DATE') {
+        list.sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
+      } else {
+        list.sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0));
+      }
+
+      return list;
+    }
+
+    function renderJobs() {
+      const filtered = getFilteredJobs();
+      const grid = document.getElementById('jobsGrid');
+
+      const totalExcludedCount = state.jobs.filter(
+        j => state.irrelevantIds.includes(j.id) || j.isAutoFiltered
+      ).length;
+
+      document.getElementById('statShown').textContent = String(filtered.length);
+      document.getElementById('statTotal').textContent = String(state.jobs.length);
+      document.getElementById('statFollowed').textContent = String(state.followedCompanies.length);
+      document.getElementById('statInterested').textContent = String(state.interestedIds.length);
+      document.getElementById('statIrrelevant').textContent = String(totalExcludedCount);
+      document.getElementById('statVisited').textContent = String(state.visitedIds.length);
+
+      if (!filtered.length) {
+        grid.innerHTML = `<div class="empty-state">当前筛选条件下暂无匹配岗位。可尝试切换快捷关键词、取消「仅看签证/搬迁线索」或点击「立即刷新岗位」。</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered
+        .map(job => {
+          const isManualIrrelevant = state.irrelevantIds.includes(job.id);
+          const isAutoFiltered = Boolean(job.isAutoFiltered);
+          const isExcluded = isManualIrrelevant || isAutoFiltered;
+          const isInterested = state.interestedIds.includes(job.id);
+          const isFollowed = Boolean(job.isFollowedCompany);
+          const isVisited = state.visitedIds.includes(job.id);
+          const noteObj = state.feedbackNotes[job.id];
+          const mode = detectWorkMode(job);
+          const cyberTags = (job.matchedCyberPillars || [])
+            .map(p => `<span class="tag cyber">${p}</span>`)
+            .join('');
+
+          const noteHtml = noteObj && noteObj.reason
+            ? `<div class="feedback-note-banner ${noteObj.type === 'interested' ? 'pos' : 'neg'}">
+                 <strong>${noteObj.type === 'interested' ? '正向备注' : '排除原因'}：</strong>${escapeHtml(noteObj.reason)}
+               </div>`
+            : (isAutoFiltered && job.autoFilterReason
+                ? `<div class="feedback-note-banner neg"><strong>联动过滤：</strong>${escapeHtml(job.autoFilterReason)}</div>`
+                : '');
+
+          return `
+            <article class="job-card ${isExcluded ? 'irrelevant' : ''} ${isInterested ? 'interested' : ''} ${isFollowed ? 'followed-company' : ''}">
+              <div>
+                <div class="card-top">
+                  <div>
+                    <h3 class="job-title">${escapeHtml(job.title || '未命名岗位')}</h3>
+                    <div class="company-row">
+                      <span class="job-company">${escapeHtml(job.company || '未知企业')}</span>
+                      <button type="button" class="follow-btn ${isFollowed ? 'active' : ''}" data-follow-company="${escapeAttr(job.company || '')}">
+                        ${isFollowed ? '★ 已关注' : '+ 关注'}
+                      </button>
+                      ${job.officialCareersUrl ? `<a class="site-link-mini" href="${escapeAttr(job.officialCareersUrl)}" target="_blank" rel="noopener noreferrer">官网职位 ↗</a>` : ''}
+                    </div>
+                  </div>
+                  <div class="card-feedback-actions">
+                    <button type="button" class="interested-btn ${isInterested ? 'active' : ''}" data-interested-id="${escapeAttr(job.id)}">
+                      ${isInterested ? '✓ 感兴趣' : '感兴趣'}
+                    </button>
+                    <button type="button" class="irrelevant-btn ${isManualIrrelevant ? 'active' : ''}" data-irrelevant-id="${escapeAttr(job.id)}">
+                      ${isManualIrrelevant ? '已标不相关' : '不相关'}
+                    </button>
+                  </div>
+                </div>
+
+                <div class="meta-tags" style="margin-top: 10px;">
+                  <span class="tag score">推荐分 ${job.recommendationScore ?? 0}</span>
+                  <span class="tag">${escapeHtml(job.location || '未注明地点')}</span>
+                  <span class="tag">${escapeHtml(mode)}</span>
+                  ${job.hasVisaSupport ? '<span class="tag visa">签证/搬迁线索</span>' : ''}
+                  ${job.isOfficialCareerFeed ? '<span class="tag official">官网 Open Positions</span>' : ''}
+                  ${isAutoFiltered && !isManualIrrelevant ? '<span class="tag auto-filtered">同类负向过滤</span>' : ''}
+                  ${cyberTags}
+                </div>
+
+                ${noteHtml}
+
+                <p class="job-desc" style="margin-top: 10px;">${escapeHtml(stripHtml(job.description || job.responsibilities || '暂无详细描述，请点击查看详情或跳转原帖。'))}</p>
+              </div>
+
+              <div class="card-footer">
+                <div>
+                  ${job.salary ? `<span style="color:#fde68a;margin-right:8px;">${escapeHtml(job.salary)}</span>` : ''}
+                  ${isVisited ? '<span class="visited-badge">✓ 已跳转原帖</span>' : `<span style="color:var(--muted);">来源：${escapeHtml(job.source || '公开接口')}</span>`}
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <button type="button" data-detail-id="${escapeAttr(job.id)}">详情</button>
+                  <a href="${escapeAttr(job.url || '#')}" target="_blank" rel="noopener noreferrer" data-visit-id="${escapeAttr(job.id)}" style="text-decoration:none;">
+                    <button type="button" class="primary">投递/原帖 ↗</button>
+                  </a>
+                </div>
+              </div>
+            </article>
+          `;
+        })
+        .join('');
+
+      grid.querySelectorAll('button[data-follow-company]').forEach(btn => {
+        btn.addEventListener('click', () => toggleFollowCompany(btn.getAttribute('data-follow-company')));
+      });
+
+      grid.querySelectorAll('button[data-interested-id]').forEach(btn => {
+        btn.addEventListener('click', () => handleFeedbackButtonClick(btn.getAttribute('data-interested-id'), 'interested'));
+      });
+
+      grid.querySelectorAll('button[data-irrelevant-id]').forEach(btn => {
+        btn.addEventListener('click', () => handleFeedbackButtonClick(btn.getAttribute('data-irrelevant-id'), 'irrelevant'));
+      });
+
+      grid.querySelectorAll('button[data-detail-id]').forEach(btn => {
+        btn.addEventListener('click', () => openDetailModal(btn.getAttribute('data-detail-id')));
+      });
+
+      grid.querySelectorAll('a[data-visit-id]').forEach(link => {
+        link.addEventListener('click', () => markVisited(link.getAttribute('data-visit-id')));
+      });
+    }
+
+    function openDetailModal(jobId) {
+      const job = state.jobs.find(j => j.id === jobId);
+      if (!job) return;
+      state.activeDetailId = jobId;
+
+      document.getElementById('detailTitle').textContent = `${job.title || ''} — ${job.company || ''}`;
+
+      const followBtn = document.getElementById('detailFollowBtn');
+      const isFol = isCompanyFollowed(job.company, state.followedCompanies);
+      followBtn.textContent = isFol ? '★ 已关注公司（取消）' : '+ 关注公司并抓官网';
+      followBtn.classList.toggle('active', isFol);
+      followBtn.onclick = () => toggleFollowCompany(job.company);
+
+      document.getElementById('detailMeta').innerHTML = `
+        <span class="tag score">推荐分 ${job.recommendationScore ?? 0}（基础 ${job.baseScore ?? 0} / 学习修正 ${job.learningAdjustment >= 0 ? '+' : ''}${job.learningAdjustment ?? 0}）</span>
+        <span class="tag">${escapeHtml(job.location || '')}</span>
+        <span class="tag">${escapeHtml(detectWorkMode(job))}</span>
+        ${job.isOfficialCareerFeed ? '<span class="tag official">官网 Open Positions</span>' : ''}
+        ${(job.matchedCyberPillars || []).map(p => `<span class="tag cyber">${p}</span>`).join('')}
+      `;
+
+      const linksParts = [];
+      if (job.officialWebsite) {
+        linksParts.push(`<a href="${escapeAttr(job.officialWebsite)}" target="_blank" rel="noopener noreferrer" style="color:#7dd3fc;">公司官网 ↗</a>`);
+      }
+      if (job.officialCareersUrl) {
+        linksParts.push(`<a href="${escapeAttr(job.officialCareersUrl)}" target="_blank" rel="noopener noreferrer" style="color:#fde68a;">官网 Open Positions / Vacancies ↗</a>`);
+      }
+      document.getElementById('detailWebsiteLinks').innerHTML = linksParts.join('');
+
+      const noteObj = state.feedbackNotes[job.id];
+      document.getElementById('detailFeedbackBanner').innerHTML = noteObj && noteObj.reason
+        ? `<div class="feedback-note-banner ${noteObj.type === 'interested' ? 'pos' : 'neg'}" style="margin-bottom:12px;">
+             <strong>${noteObj.type === 'interested' ? '正向备注' : '排除原因'}：</strong>${escapeHtml(noteObj.reason)}
+           </div>`
+        : (job.isAutoFiltered && job.autoFilterReason
+            ? `<div class="feedback-note-banner neg" style="margin-bottom:12px;"><strong>联动过滤：</strong>${escapeHtml(job.autoFilterReason)}</div>`
+            : '');
+
+      document.getElementById('detailBody').textContent = stripHtml(job.description || job.responsibilities || '暂无完整描述。');
+      const linkEl = document.getElementById('detailOriginalLink');
+      linkEl.href = job.url || '#';
+      linkEl.onclick = () => markVisited(job.id);
+
+      const intBtn = document.getElementById('detailInterestedBtn');
+      const isInt = state.interestedIds.includes(job.id);
+      intBtn.textContent = isInt ? '✓ 感兴趣 · 撤销' : '感兴趣';
+      intBtn.classList.toggle('active', isInt);
+      intBtn.onclick = () => handleFeedbackButtonClick(job.id, 'interested');
+
+      const irrBtn = document.getElementById('detailIrrelevantBtn');
+      const isIrr = state.irrelevantIds.includes(job.id);
+      irrBtn.textContent = isIrr ? '已标不相关 · 撤销' : '不相关';
+      irrBtn.classList.toggle('active', isIrr);
+      irrBtn.onclick = () => handleFeedbackButtonClick(job.id, 'irrelevant');
+
+      document.getElementById('detailModal').classList.add('open');
+    }
+
+    function openLearningModal() {
+      document.getElementById('adaptiveQueryPreview').textContent = buildAdaptiveSearchQuery();
+
+      const posEntries = Object.entries(state.learning.positiveWeights || {})
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 20);
+      document.getElementById('posWeightsList').innerHTML = posEntries.length
+        ? posEntries.map(([k, v]) => `<span class="tag visa">${escapeHtml(k)} (+${Number(v).toFixed(1)})</span>`).join('')
+        : '<span style="color:var(--muted);font-size:12px;">暂无正样本加权记录，点击卡片右上角「感兴趣」或「关注」公司即可强化匹配。</span>';
+
+      const negEntries = Object.entries(state.learning.negativeWeights || {})
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 20);
+      document.getElementById('negWeightsList').innerHTML = negEntries.length
+        ? negEntries.map(([k, v]) => `<span class="tag">${escapeHtml(k)} (-${Number(v).toFixed(1)})</span>`).join('')
+        : '<span style="color:var(--muted);font-size:12px;">暂无负样本降权记录，点击卡片右上角「不相关」即可开始学习。</span>';
+
+      const logsEl = document.getElementById('feedbackLogsList');
+      const logs = state.feedbackLogs.slice(0, 15);
+      logsEl.innerHTML = logs.length
+        ? logs.map(item => `
+            <div class="log-item">
+              <div style="display:flex;justify-content:space-between;gap:8px;">
+                <strong style="color:${item.type === 'interested' ? '#4ade80' : '#fca5a5'};">
+                  ${item.type === 'interested' ? '【感兴趣】' : '【不相关】'} ${escapeHtml(item.title)} — ${escapeHtml(item.company)}
+                </strong>
+                <span style="color:var(--muted);">${new Date(item.timestamp).toLocaleString()}</span>
+              </div>
+              <div style="margin-top:4px;color:#cbd5e1;">
+                原因备注：${item.reason ? escapeHtml(item.reason) : '<span style="color:var(--muted);">（跳过未填）</span>'}
+              </div>
+              ${item.extractedTokens?.length ? `<div style="margin-top:4px;color:#7dd3fc;">提取策略词：${item.extractedTokens.map(escapeHtml).join(', ')}</div>` : ''}
+            </div>
+          `).join('')
+        : '<span style="color:var(--muted);font-size:12px;">暂无反馈历史记录。</span>';
+
+      document.getElementById('learningModal').classList.add('open');
+    }
+
+    async function fetchArbeitnowJobs() {
+      try {
+        const res = await fetchWithTimeout('https://www.arbeitnow.com/api/job-board-api');
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.data || []).map((item, idx) => ({
+          id: `arbeitnow-${item.slug || idx}`,
+          title: item.title,
+          company: item.company_name,
+          location: item.location,
+          workMode: item.remote ? 'Remote' : 'Hybrid',
+          description: item.description || '',
+          tags: item.tags || [],
+          url: item.url,
+          publishedAt: item.created_at ? new Date(item.created_at * 1000).toISOString() : new Date().toISOString(),
+          source: 'Arbeitnow'
+        }));
+      } catch (_) {
+        return [];
+      }
+    }
+
+    async function fetchRemotiveJobs() {
+      try {
+        const res = await fetchWithTimeout('https://remotive.com/api/remote-jobs?limit=80');
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.jobs || []).map(item => ({
+          id: `remotive-${item.id}`,
+          title: item.title,
+          company: item.company_name,
+          location: item.candidate_required_location || 'Worldwide Remote',
+          workMode: 'Remote',
+          salary: item.salary || '',
+          description: item.description || '',
+          tags: item.tags || [],
+          url: item.url,
+          publishedAt: item.publication_date || new Date().toISOString(),
+          source: 'Remotive'
+        }));
+      } catch (_) {
+        return [];
+      }
+    }
+
+    async function fetchCustomJsonFeeds(urls = []) {
+      const results = [];
+      for (const rawUrl of urls) {
+        const url = String(rawUrl || '').trim();
+        if (!url) continue;
+        try {
+          const res = await fetchWithTimeout(url);
+          if (!res.ok) continue;
+          const payload = await res.json();
+          const items = Array.isArray(payload) ? payload : (payload.jobs || []);
+          items.forEach((item, idx) => {
+            results.push({
+              id: item.id || `feed-${idx}-${Math.random().toString(36).slice(2, 7)}`,
+              title: item.title,
+              company: item.company || item.company_name || 'External Feed',
+              location: item.location || '',
+              workMode: item.workMode || item.work_mode || '',
+              salary: item.salary || '',
+              description: item.description || item.jd || '',
+              responsibilities: item.responsibilities || '',
+              visaSponsored: Boolean(item.visaSponsored ?? item.visa_sponsored ?? item.hasVisaSupport),
+              url: item.url || item.apply_url || '#',
+              publishedAt: item.publishedAt || item.published_at || new Date().toISOString(),
+              source: item.source || 'CustomJSON'
+            });
+          });
+        } catch (_) {}
+      }
+      return results;
+    }
+
+    async function refreshAllJobs(forceNetwork = true) {
+      if (isRefreshing) return;
+      isRefreshing = true;
+
+      const refreshBtn = document.getElementById('refreshBtn');
+      const originalBtnText = refreshBtn.textContent;
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = '刷新中...';
+
+      const cached = loadJsonStorage(STORAGE_KEYS.CACHED_JOBS, null);
+
+      try {
+        if (!forceNetwork && cached && Array.isArray(cached.jobs) && cached.jobs.length > 0 && (Date.now() - cached.timestamp) < THREE_HOURS_MS) {
+          state.jobs = cached.jobs.map(j =>
+            evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies)
+          );
+          document.getElementById('sourceStatusText').textContent = `已加载 3 小时内缓存（${state.jobs.length} 条）· 更新于 ${new Date(cached.timestamp).toLocaleTimeString()}`;
+          renderJobs();
+          return;
+        }
+
+        document.getElementById('sourceStatusText').textContent = '正在并行拉取公开招聘数据源...';
+
+        const boards = Array.isArray(state.settings.greenhouseBoards) && state.settings.greenhouseBoards.length
+          ? state.settings.greenhouseBoards
+          : DEFAULT_GREENHOUSE_BOARDS;
+
+        const tasks = [
+          fetchArbeitnowJobs(),
+          fetchRemotiveJobs(),
+          ...boards.map(b => fetchGreenhouseBoard(b)),
+          fetchCustomJsonFeeds(state.settings.customJsonFeeds || [])
+        ];
+
+        const settled = await Promise.allSettled(tasks);
+        const merged = [];
+        const seen = new Set();
+
+        for (const r of settled) {
+          if (r.status !== 'fulfilled' || !Array.isArray(r.value)) continue;
+          for (const item of r.value) {
+            if (!item || !item.title) continue;
+            const dedupKey = `${normalizeSearchText(item.title)}|${normalizeCompanyKey(item.company)}|${normalizeSearchText(item.location)}`;
+            if (seen.has(dedupKey)) continue;
+            seen.add(dedupKey);
+            merged.push(item);
+          }
+        }
+
+        if (merged.length > 0) {
+          saveJsonStorage(STORAGE_KEYS.CACHED_JOBS, { timestamp: Date.now(), jobs: merged });
+          state.jobs = merged.map(j =>
+            evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies)
+          );
+          document.getElementById('sourceStatusText').textContent = `已同步 ${state.jobs.length} 条去重岗位 · 更新于 ${new Date().toLocaleTimeString()}`;
+        } else if (cached?.jobs?.length) {
+          state.jobs = cached.jobs.map(j =>
+            evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies)
+          );
+          document.getElementById('sourceStatusText').textContent = `外部接口超时或受限，已回退至本地缓存（${state.jobs.length} 条）· 点击「立即刷新岗位」可重试`;
+        } else {
+          state.jobs = [];
+          document.getElementById('sourceStatusText').textContent = '当前未获取到外部岗位（可能受网络/跨域限制），可点击「数据源配置」添加 JSON Feed 或 Greenhouse Token';
+        }
+
+        renderJobs();
+
+        if (state.followedCompanies.length > 0) {
+          Promise.allSettled(
+            state.followedCompanies.map(item => crawlFollowedCompanyCareers(item.name || item, true))
+          );
+        }
+      } catch (err) {
+        if (cached?.jobs?.length) {
+          state.jobs = cached.jobs.map(j =>
+            evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies)
+          );
+          renderJobs();
+        }
+        document.getElementById('sourceStatusText').textContent = `刷新遇到网络异常，已保护面板可用（${state.jobs.length} 条）`;
+      } finally {
+        isRefreshing = false;
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = originalBtnText || '立即刷新岗位';
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(str) {
+      return escapeHtml(str).replace(/'/g, '&#39;');
+    }
+
+    function bindEvents() {
+      document.getElementById('refreshBtn').addEventListener('click', () => refreshAllJobs(true));
+      document.getElementById('syncFollowedBtn').addEventListener('click', syncAllFollowedCompanies);
+
+      document.getElementById('closeToastBtn').addEventListener('click', () => {
+        document.getElementById('feedbackToastBanner').classList.remove('show');
+      });
+
+      document.getElementById('searchInput').addEventListener('input', e => {
+        state.searchQuery = e.target.value;
+        renderJobs();
+      });
+
+      document.getElementById('regionFilter').addEventListener('change', e => {
+        state.region = e.target.value;
+        renderJobs();
+      });
+
+      document.getElementById('modeFilter').addEventListener('change', e => {
+        state.mode = e.target.value;
+        renderJobs();
+      });
+
+      document.getElementById('sortFilter').addEventListener('change', e => {
+        state.sortBy = e.target.value;
+        renderJobs();
+      });
+
+      document.getElementById('visaOnlyCheckbox').addEventListener('change', e => {
+        state.visaOnly = e.target.checked;
+        renderJobs();
+      });
+
+      document.getElementById('followedOnlyCheckbox').addEventListener('change', e => {
+        state.followedOnly = e.target.checked;
+        renderJobs();
+      });
+
+      document.getElementById('interestedOnlyCheckbox').addEventListener('change', e => {
+        state.interestedOnly = e.target.checked;
+        renderJobs();
+      });
+
+      document.getElementById('showIrrelevantCheckbox').addEventListener('change', e => {
+        state.showIrrelevant = e.target.checked;
+        renderJobs();
+      });
+
+      document.getElementById('closeFeedbackInputBtn').addEventListener('click', () => {
+        state.pendingFeedback = null;
+        document.getElementById('feedbackInputModal').classList.remove('open');
+      });
+
+      document.getElementById('skipFeedbackBtn').addEventListener('click', () => {
+        commitPendingFeedback('');
+      });
+
+      document.getElementById('confirmFeedbackBtn').addEventListener('click', () => {
+        const text = document.getElementById('feedbackReasonTextarea').value;
+        commitPendingFeedback(text);
+      });
+
+      document.getElementById('closeDetailBtn').addEventListener('click', () => {
+        document.getElementById('detailModal').classList.remove('open');
+      });
+
+      document.getElementById('learningBtn').addEventListener('click', openLearningModal);
+      document.getElementById('closeLearningBtn').addEventListener('click', () => {
+        document.getElementById('learningModal').classList.remove('open');
+      });
+      document.getElementById('saveLearningCloseBtn').addEventListener('click', () => {
+        document.getElementById('learningModal').classList.remove('open');
+      });
+
+      document.getElementById('resetLearningBtn').addEventListener('click', () => {
+        state.irrelevantIds = [];
+        state.interestedIds = [];
+        state.visitedIds = [];
+        state.feedbackNotes = {};
+        state.feedbackLogs = [];
+        state.negativeRules = [];
+        state.learning = { positiveWeights: {}, negativeWeights: {} };
+        saveJsonStorage(STORAGE_KEYS.IRRELEVANT_IDS, []);
+        saveJsonStorage(STORAGE_KEYS.INTERESTED_IDS, []);
+        saveJsonStorage(STORAGE_KEYS.VISITED_IDS, []);
+        saveJsonStorage(STORAGE_KEYS.FEEDBACK_NOTES, {});
+        saveJsonStorage(STORAGE_KEYS.FEEDBACK_LOGS, []);
+        saveJsonStorage(STORAGE_KEYS.NEGATIVE_RULES, []);
+        saveJsonStorage(STORAGE_KEYS.LEARNING_STATE, state.learning);
+        reScoreAndRender();
+        openLearningModal();
+        showFeedbackToast('已重置所有自学习权重与负向排除规则，所有岗位已恢复展示。');
+      });
+
+      document.getElementById('settingsBtn').addEventListener('click', () => {
+        document.getElementById('customJsonFeedsInput').value = (state.settings.customJsonFeeds || []).join('\n');
+        document.getElementById('greenhouseBoardsInput').value = (state.settings.greenhouseBoards || []).join(', ');
+        const slugLines = Object.entries(state.settings.customCompanySlugs || {}).map(([k, v]) => `${k}=${v}`);
+        document.getElementById('customCompanySlugsInput').value = slugLines.join('\n');
+        document.getElementById('jsearchKeyInput').value = state.settings.jsearchKey || '';
+        document.getElementById('settingsModal').classList.add('open');
+      });
+
+      document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+        document.getElementById('settingsModal').classList.remove('open');
+      });
+
+      document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+        const feeds = document.getElementById('customJsonFeedsInput').value
+          .split(/\r?\n/)
+          .map(s => s.trim())
+          .filter(Boolean);
+        const boards = document.getElementById('greenhouseBoardsInput').value
+          .split(/[\s,]+/)
+          .map(s => s.trim())
+          .filter(Boolean);
+        const customCompanySlugs = {};
+        document.getElementById('customCompanySlugsInput').value
+          .split(/\r?\n/)
+          .map(s => s.trim())
+          .filter(Boolean)
+          .forEach(line => {
+            const idx = line.indexOf('=');
+            if (idx > 0) {
+              const comp = line.slice(0, idx).trim();
+              const target = line.slice(idx + 1).trim();
+              if (comp && target) customCompanySlugs[comp] = target;
+            }
+          });
+        const jsearchKey = document.getElementById('jsearchKeyInput').value.trim();
+
+        state.settings = { customJsonFeeds: feeds, greenhouseBoards: boards, customCompanySlugs, jsearchKey };
+        saveJsonStorage(STORAGE_KEYS.SETTINGS, state.settings);
+        document.getElementById('settingsModal').classList.remove('open');
+        refreshAllJobs(true);
+      });
+
+      setInterval(() => {
+        refreshAllJobs(true);
+      }, THREE_HOURS_MS);
+    }
+
+    renderQuickKeywords();
+    renderFollowedBar();
+    renderExternalBoards();
+    bindEvents();
+    refreshAllJobs(false);
+  </script>
+</body>
+</html>
