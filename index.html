@@ -267,6 +267,81 @@
       margin-right: 4px;
     }
 
+    .kw-chip-group {
+      display: inline-flex;
+      align-items: center;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      overflow: hidden;
+      transition: all 0.16s ease;
+    }
+
+    .kw-chip-group:hover {
+      border-color: var(--accent);
+    }
+
+    .kw-chip-group.active {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: var(--accent);
+    }
+
+    .kw-chip-select {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 6px 10px;
+      font-size: 12.5px;
+      color: inherit;
+    }
+
+    .kw-chip-group.active .kw-chip-select {
+      color: #bae6fd;
+      font-weight: 600;
+    }
+
+    .kw-chip-select:hover:not(:disabled) {
+      transform: none;
+    }
+
+    .kw-chip-del {
+      background: transparent;
+      border: none;
+      border-left: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 0;
+      padding: 6px 8px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1;
+    }
+
+    .kw-chip-del:hover:not(:disabled) {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      transform: none;
+    }
+
+    .kw-add-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 4px;
+    }
+
+    .kw-add-inline input {
+      min-width: 155px;
+      width: 165px;
+      flex: 0 0 auto;
+      padding: 6px 10px;
+      font-size: 12.5px;
+    }
+
+    .kw-add-inline button {
+      padding: 6px 11px;
+      font-size: 12.5px;
+      white-space: nowrap;
+    }
+
     .board-links {
       display: flex;
       flex-wrap: wrap;
@@ -876,6 +951,7 @@
 
   <script>
     const STORAGE_KEYS = {
+      QUICK_KEYWORDS: 'acvj_quick_keywords_v7',
       IRRELEVANT_IDS: 'acvj_irrelevant_ids_v7',
       INTERESTED_IDS: 'acvj_interested_ids_v7',
       FOLLOWED_COMPANIES: 'acvj_followed_companies_v7',
@@ -892,7 +968,7 @@
     const SINGLE_API_TIMEOUT_MS = 2400;
     const GLOBAL_REFRESH_WATCHDOG_MS = 4500;
 
-    const QUICK_KEYWORDS = [
+    const DEFAULT_QUICK_KEYWORDS = [
       '全部',
       'Product Manager',
       'Product Owner',
@@ -1002,9 +1078,6 @@
     let isRefreshing = false;
     let refreshAttemptCounter = 0;
 
-    /**
-     * 强超时 JSON 请求（严格受 SINGLE_API_TIMEOUT_MS 控制，绝不无限挂起）
-     */
     async function fetchJsonDirect(url, timeoutMs = SINGLE_API_TIMEOUT_MS) {
       const controller = new AbortController();
       let timerId = null;
@@ -1062,8 +1135,10 @@
     function expandKeywordVariants(keyword) {
       const clean = String(keyword || '').trim();
       if (!clean || clean === '全部') return [];
-      if (AUTOMOTIVE_CYBER_VARIANTS[clean]) return AUTOMOTIVE_CYBER_VARIANTS[clean];
-      if (ROLE_MATCH_VARIANTS[clean]) return ROLE_MATCH_VARIANTS[clean];
+      const upperKey = Object.keys(AUTOMOTIVE_CYBER_VARIANTS).find(k => k.toLowerCase() === clean.toLowerCase());
+      if (upperKey) return AUTOMOTIVE_CYBER_VARIANTS[upperKey];
+      const roleKey = Object.keys(ROLE_MATCH_VARIANTS).find(k => k.toLowerCase() === clean.toLowerCase());
+      if (roleKey) return ROLE_MATCH_VARIANTS[roleKey];
       return [clean.toLowerCase()];
     }
 
@@ -1139,7 +1214,7 @@
       return { isAutoFiltered: false, matchedRuleReason: '' };
     }
 
-    function evaluateJobListing(job, learningState = {}, interestedIds = [], negativeRules = [], followedCompanies = []) {
+    function evaluateJobListing(job, learningState = {}, interestedIds = [], negativeRules = [], followedCompanies = [], customQuickKeywords = []) {
       const title = String(job.title || '').trim();
       const company = String(job.company || '').trim();
       const location = String(job.location || '').trim();
@@ -1166,7 +1241,12 @@
         ROLE_MATCH_VARIANTS[role].some(variant => includesTerm(fullNorm, variant))
       );
 
-      const matchedPositiveTerms = CORE_POSITIVE_TERMS.filter(term => includesTerm(fullNorm, term));
+      const activeConfiguredTerms = (customQuickKeywords || [])
+        .filter(kw => kw && kw !== '全部')
+        .map(kw => kw.toLowerCase());
+
+      const dynamicPositiveTerms = Array.from(new Set([...CORE_POSITIVE_TERMS, ...activeConfiguredTerms]));
+      const matchedPositiveTerms = dynamicPositiveTerms.filter(term => includesTerm(fullNorm, term));
       const followedMeta = getFollowedMeta(company, followedCompanies);
       const followed = Boolean(followedMeta);
 
@@ -1188,7 +1268,7 @@
         score += 10;
       }
       score += Math.min(20, matchedCyberPillars.length * 7);
-      score += Math.min(10, matchedPositiveTerms.length * 1.5);
+      score += Math.min(12, matchedPositiveTerms.length * 1.5);
 
       const posWeights = learningState.positiveWeights || {};
       const negWeights = learningState.negativeWeights || {};
@@ -1244,6 +1324,7 @@
         isDomainMatch:
           matchedRoleKeywords.length > 0 ||
           matchedCyberPillars.length > 0 ||
+          matchedPositiveTerms.length >= 2 ||
           (includesTerm(fullNorm, 'automotive') && includesTerm(fullNorm, 'security')) ||
           (includesTerm(fullNorm, 'product') && (includesTerm(fullNorm, 'security') || includesTerm(fullNorm, 'vehicle')))
       };
@@ -1264,8 +1345,17 @@
       } catch (_) {}
     }
 
+    function getInitialQuickKeywords() {
+      const saved = loadJsonStorage(STORAGE_KEYS.QUICK_KEYWORDS, null);
+      if (Array.isArray(saved) && saved.length > 0) {
+        return saved.includes('全部') ? saved : ['全部', ...saved];
+      }
+      return [...DEFAULT_QUICK_KEYWORDS];
+    }
+
     let state = {
       jobs: [],
+      quickKeywords: getInitialQuickKeywords(),
       selectedKeyword: '全部',
       searchQuery: '',
       region: 'ALL',
@@ -1328,6 +1418,49 @@
       const banner = document.getElementById('feedbackToastBanner');
       document.getElementById('feedbackToastText').textContent = message;
       banner.classList.add('show');
+    }
+
+    /**
+     * 添加快捷关键词并立即触发检索与结果更新
+     */
+    async function addQuickKeyword(rawKw) {
+      const clean = String(rawKw || '').trim();
+      if (!clean) return;
+
+      const exists = state.quickKeywords.some(k => k.toLowerCase() === clean.toLowerCase());
+      if (!exists) {
+        state.quickKeywords.push(clean);
+        saveJsonStorage(STORAGE_KEYS.QUICK_KEYWORDS, state.quickKeywords);
+      }
+
+      // 设为当前激活关键词，并立刻检索更新
+      const matchedExisting = state.quickKeywords.find(k => k.toLowerCase() === clean.toLowerCase()) || clean;
+      state.selectedKeyword = matchedExisting;
+
+      renderQuickKeywords();
+      reScoreAndRender();
+      showFeedbackToast(`已添加快捷关键词「${matchedExisting}」，正在立刻检索并更新结果...`);
+      await refreshAllJobs(true);
+    }
+
+    /**
+     * 删除快捷关键词并立即触发检索与结果更新
+     */
+    async function removeQuickKeyword(targetKw) {
+      const clean = String(targetKw || '').trim();
+      if (!clean || clean === '全部') return;
+
+      state.quickKeywords = state.quickKeywords.filter(k => k !== clean);
+      saveJsonStorage(STORAGE_KEYS.QUICK_KEYWORDS, state.quickKeywords);
+
+      if (state.selectedKeyword === clean) {
+        state.selectedKeyword = '全部';
+      }
+
+      renderQuickKeywords();
+      reScoreAndRender();
+      showFeedbackToast(`已删除快捷关键词「${clean}」，正在立刻检索并更新结果...`);
+      await refreshAllJobs(true);
     }
 
     async function discoverCompanyWebsiteAndCareers(companyName, seedJobUrl = '') {
@@ -1549,7 +1682,7 @@
         }
 
         const evaluatedOfficial = rawOfficialJobs.map(j =>
-          evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies)
+          evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies, state.quickKeywords)
         );
         const matchedOfficial = evaluatedOfficial.filter(
           j => j.isDomainMatch || j.hasVisaSupport || j.recommendationScore >= 42
@@ -1976,9 +2109,10 @@
     }
 
     function buildAdaptiveSearchQuery() {
+      const configuredTerms = (state.quickKeywords || []).filter(k => k && k !== '全部');
       const baseTerms = state.selectedKeyword && state.selectedKeyword !== '全部'
         ? [state.selectedKeyword]
-        : ['Product Manager', 'Automotive Cybersecurity', 'CSMS', 'R155', 'VSOC', 'IDPS', '21434'];
+        : (configuredTerms.length ? configuredTerms : ['Product Manager', 'Automotive Cybersecurity']);
 
       const negEntries = Object.entries(state.learning.negativeWeights || {})
         .filter(([k]) => !k.startsWith('company:') && !k.startsWith('region:') && /^[a-z0-9\-\/]+$/i.test(k))
@@ -2013,11 +2147,27 @@
     function renderQuickKeywords() {
       const container = document.getElementById('quickKeywordsContainer');
       const labelHtml = '<span class="chip-label">快捷关键词：</span>';
-      const chipsHtml = QUICK_KEYWORDS.map(kw => {
-        const activeClass = state.selectedKeyword === kw ? 'active-chip' : '';
-        return `<button type="button" class="${activeClass}" data-kw="${kw}">${kw}</button>`;
+      const chipsHtml = state.quickKeywords.map(kw => {
+        const isActive = state.selectedKeyword === kw;
+        if (kw === '全部') {
+          return `<button type="button" class="${isActive ? 'active-chip' : ''}" data-kw="全部">全部</button>`;
+        }
+        return `
+          <span class="kw-chip-group ${isActive ? 'active' : ''}">
+            <button type="button" class="kw-chip-select" data-kw="${escapeAttr(kw)}">${escapeHtml(kw)}</button>
+            <button type="button" class="kw-chip-del" data-del-kw="${escapeAttr(kw)}" title="删除关键词「${escapeAttr(kw)}」">×</button>
+          </span>
+        `;
       }).join('');
-      container.innerHTML = labelHtml + chipsHtml;
+
+      const addInlineHtml = `
+        <span class="kw-add-inline">
+          <input id="newQuickKwInput" type="text" placeholder="新关键词（如 TARA）" />
+          <button id="addQuickKwBtn" type="button">+ 添加</button>
+        </span>
+      `;
+
+      container.innerHTML = labelHtml + chipsHtml + addInlineHtml;
 
       container.querySelectorAll('button[data-kw]').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -2027,11 +2177,35 @@
           renderJobs();
         });
       });
+
+      container.querySelectorAll('button[data-del-kw]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          removeQuickKeyword(btn.getAttribute('data-del-kw'));
+        });
+      });
+
+      const inputEl = document.getElementById('newQuickKwInput');
+      const addBtn = document.getElementById('addQuickKwBtn');
+      const triggerAdd = () => {
+        const val = inputEl.value.trim();
+        if (val) {
+          addQuickKeyword(val);
+        }
+      };
+
+      addBtn.addEventListener('click', triggerAdd);
+      inputEl.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          triggerAdd();
+        }
+      });
     }
 
     function reScoreAndRender() {
       state.jobs = state.jobs.map(job =>
-        evaluateJobListing(job, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies)
+        evaluateJobListing(job, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies, state.quickKeywords)
       );
       renderExternalBoards();
       renderJobs();
@@ -2096,7 +2270,7 @@
       document.getElementById('statVisited').textContent = String(state.visitedIds.length);
 
       if (!filtered.length) {
-        grid.innerHTML = `<div class="empty-state">当前筛选条件下暂无匹配岗位。可尝试切换快捷关键词、取消「仅看签证/搬迁线索」或点击「立即刷新岗位」。</div>`;
+        grid.innerHTML = `<div class="empty-state">当前筛选条件下暂无匹配岗位（当前快捷词：<strong>${escapeHtml(state.selectedKeyword)}</strong>）。可点击「全部」查看全量岗位或添加/调整快捷关键词。</div>`;
         return;
       }
 
@@ -2430,7 +2604,10 @@
 
     async function fetchJobicyJobs() {
       try {
-        const data = await fetchJsonDirect('https://jobicy.com/api/v2/remote-jobs?count=50&tag=product');
+        const tagParam = state.selectedKeyword && state.selectedKeyword !== '全部'
+          ? encodeURIComponent(state.selectedKeyword.toLowerCase().split(/\s+/)[0])
+          : 'product';
+        const data = await fetchJsonDirect(`https://jobicy.com/api/v2/remote-jobs?count=50&tag=${tagParam}`);
         return (data.jobs || []).map(item => ({
           id: `jobicy-${item.id}`,
           title: item.jobTitle,
@@ -2476,14 +2653,10 @@
       return results;
     }
 
-    /**
-     * 核心刷新：纯真实接口拉取 + 强超时收口 + 绝不阻塞按钮点击
-     */
     async function refreshAllJobs(forceNetwork = true) {
       refreshAttemptCounter += 1;
       const attemptNo = refreshAttemptCounter;
 
-      // 若上次刷新卡在边缘状态超过看门狗时限，强制重置锁以响应本次点击
       if (isRefreshing) {
         isRefreshing = false;
       }
@@ -2498,7 +2671,7 @@
 
       if (cached && Array.isArray(cached.jobs) && cached.jobs.length > 0 && state.jobs.length === 0) {
         state.jobs = cached.jobs.map(j =>
-          evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies)
+          evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies, state.quickKeywords)
         );
         renderJobs();
       }
@@ -2512,7 +2685,7 @@
         return;
       }
 
-      statusEl.textContent = `第 ${attemptNo} 次刷新：正在拉取真实公开招聘数据源...`;
+      statusEl.textContent = `第 ${attemptNo} 次刷新（当前关键词：${state.selectedKeyword}）：正在拉取真实公开招聘数据源...`;
 
       const boards = Array.isArray(state.settings.greenhouseBoards) && state.settings.greenhouseBoards.length
         ? state.settings.greenhouseBoards
@@ -2554,28 +2727,20 @@
         if (Array.isArray(result) && result.length > 0) {
           saveJsonStorage(STORAGE_KEYS.CACHED_JOBS, { timestamp: Date.now(), jobs: result });
           state.jobs = result.map(j =>
-            evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies)
+            evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies, state.quickKeywords)
           );
-          statusEl.textContent = `已拉取 ${state.jobs.length} 条真实去重岗位 · 更新于 ${new Date().toLocaleTimeString()}`;
-          if (attemptNo > 1) {
-            showFeedbackToast(`刷新完成：已同步 ${state.jobs.length} 条真实岗位数据。`);
-          }
+          statusEl.textContent = `已拉取 ${state.jobs.length} 条真实去重岗位（关键词：${state.selectedKeyword}）· 更新于 ${new Date().toLocaleTimeString()}`;
         } else if (cached && Array.isArray(cached.jobs) && cached.jobs.length > 0) {
           state.jobs = cached.jobs.map(j =>
-            evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies)
+            evaluateJobListing(j, state.learning, state.interestedIds, state.negativeRules, state.followedCompanies, state.quickKeywords)
           );
-          statusEl.textContent = `外部接口超时或受跨域限制，已保留本地真实缓存（${state.jobs.length} 条）· 点击「立即刷新岗位」可重试`;
-          if (attemptNo > 1) {
-            showFeedbackToast('外部接口本次响应超时或受跨域限制，已保留现有真实数据。');
-          }
+          statusEl.textContent = `外部接口超时或受跨域限制，已基于本地真实缓存（${state.jobs.length} 条）完成关键词「${state.selectedKeyword}」检索`;
         } else {
           state.jobs = [];
           statusEl.textContent = `外部接口未能返回数据（可能受跨域或网络限制），可在「数据源配置」中添加 JSON Feed 或 Greenhouse Board Token`;
-          if (attemptNo > 1) {
-            showFeedbackToast('外部公开接口未返回数据，请检查网络或前往「数据源配置」添加可用 JSON Feed。');
-          }
         }
 
+        renderExternalBoards();
         renderJobs();
 
         if (state.followedCompanies.length > 0) {
